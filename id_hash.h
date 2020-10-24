@@ -9,7 +9,7 @@ struct Hash_For_Id_Entry{
   specs Specs ;
   complex Complex ;
 
-  hashed_id next ;
+  hashed_Id next ;
 };
 
 // struct for bucket of hash table for full ids.
