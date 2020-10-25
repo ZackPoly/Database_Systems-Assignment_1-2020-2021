@@ -1,10 +1,4 @@
-#include <stdio.h>
-#include <stdlib.h>
-#include <string.h>
-#include <sys/types.h>
-#include <dirent.h>
-#include <unistd.h>
-#include <errno.h>
+#include "site_hash.h"
 
 // prwto orisma to camera_specs kai deutero to csv
 
@@ -93,8 +87,7 @@ int main(int argc, char** argv){
       if(data!=NULL){
 
         fread(data,1,length,JSON_file);       //store specs
-        printf("data: %s",data);
-
+        printf("%s\n",data );
       }
 
       //insert(data)
