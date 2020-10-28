@@ -21,12 +21,15 @@ Hashed_Id search_id_in_hash(Hash_For_Id IdTable,char* full_id,int bucketsNum){
   return NULL ;
 }
 
-void insert_id_in_hash(Hash_For_Id IdTable,int bucketsNum,char* full_id,char* specsData){
+Hashed_Id insert_id_in_hash(Hash_For_Id IdTable,int bucketsNum,char* full_id,char* specsData){
 
   /*                     DUPLICATE ID REJECTED                     */
   if(search_id_in_hash(IdTable,full_id,bucketsNum)!=NULL) return NULL ;
 
   /*                  EMPTY BUCKET LIST                     */
+
+  int hashIndex=hash_func(full_id,bucketsNum);
+
   if(IdTable[hashIndex].root==NULL){
     IdTable[hashIndex].root=malloc(sizeof(struct Hash_For_Id_Entry)) ;
     IdTable[hashIndex].root->next=NULL ;
@@ -50,7 +53,7 @@ void insert_id_in_hash(Hash_For_Id IdTable,int bucketsNum,char* full_id,char* sp
   while(curId->next!=NULL){ // collision
     curId=curId->next ;
   }
-  curId->next=malloc(sizeof(struct Hash_For_Site_Entry)) ;
+  curId->next=malloc(sizeof(struct Hash_For_Id_Entry)) ;
   curId->next->next=NULL ;
   curId->next->full_id=malloc(strlen(full_id)+1) ;
   strcpy(curId->next->full_id,full_id) ;
