@@ -12,24 +12,22 @@
 
 int main(int argc, char** argv){
 
-
-  char* dataset_path=NULL;                      //change dir to open camera_specs
-  dataset_path=malloc(strlen(argv[1])+1);
-  strcpy(dataset_path,argv[1]);
-  strcat(dataset_path,"/");
-  chdir(dataset_path);
-
   DIR* DD;
   struct dirent* main_dir;
 
-  DD=opendir(dataset_path);
+  DD=opendir(argv[1]);
 
-  if(DD=NULL){
+  if(DD==NULL){
     printf("Can't open directory!\n");
     return 1;
   }
 
-  free(dataset_path);
+  char fullPath[100];
+  getcwd(fullPath,100) ;
+  strcat(fullPath,"/");
+  strcat(fullPath,argv[1]);
+  chdir(fullPath);
+  char* dataset_path=NULL;
 
   while((main_dir=readdir(DD))!=NULL){
 
@@ -41,10 +39,15 @@ int main(int argc, char** argv){
       continue;
     }
 
-    dataset_path=malloc(strlen(main_dir->d_name)+2);        //dataset_path=camera_specs path
-    strcpy(dataset_path,main_dir->d_name);
-    strcat(dataset_path,"/");
+    if(!strcmp(main_dir->d_name,argv[2])){
+      dataset_path=malloc(strlen(main_dir->d_name)+2);        //dataset_path=camera_specs path
+      strcpy(dataset_path,main_dir->d_name);
+      //strcat(dataset_path,"/");
+
+      break ;
+    }
   }
+  printf("%s\n",dataset_path );
 
   DIR* FD;
   DIR* SD;
@@ -55,7 +58,7 @@ int main(int argc, char** argv){
   FILE* JSON_file;
   FILE* DW;
 
-  char* data;
+  char* data=NULL;
   int length;
 
   char* site=NULL;
@@ -76,7 +79,6 @@ int main(int argc, char** argv){
     printf("Can't open directory!\n");
     return 1;
   }
-
 
   Hash_For_Site site_hash_table=NULL;
 
@@ -107,10 +109,10 @@ int main(int argc, char** argv){
     printf("Subdirectory: %s\n",in_file->d_name);
 
 
-    path=malloc(strlen(argv[1])+strlen(in_file->d_name)+2);
-    strcpy(path,argv[1]);
-    strcat(path,in_file->d_name);
+    path=malloc(strlen(argv[2])+strlen(in_file->d_name)+2);
+    strcpy(path,argv[2]) ;
     strcat(path,"/");
+    strcat(path,in_file->d_name);
     SD=opendir(path);                                         //open subdirectory
 
 
@@ -139,8 +141,9 @@ int main(int argc, char** argv){
       strcat(full_id,"//");
       strcat(full_id,id);
 
-      path_ff=malloc(strlen(path)+strlen(d_files->d_name)+1);
+      path_ff=malloc(strlen(path)+strlen(d_files->d_name)+2);
       strcpy(path_ff,path);
+      strcat(path_ff,"/");
       strcat(path_ff,d_files->d_name);
 
       printf("Path for file is : %s \n ",path_ff);
@@ -157,11 +160,11 @@ int main(int argc, char** argv){
       fseek(JSON_file,0,SEEK_END);            //go to the end of file
       length=ftell(JSON_file);                //how many bytes
       fseek(JSON_file,0,SEEK_SET);            //go to the beggining of file
-      data=malloc(length);
+      data=malloc(length+1);
 
       if(data!=NULL){
 
-        fread(data,1,length,JSON_file);       //store specs
+        fread(data,length,1,JSON_file);       //store specs
         insert_id_in_hash(currSite->Id_Hash_Array,idBucketsNum,full_id,data);
         printf("data: %s",data);
 
@@ -176,7 +179,7 @@ int main(int argc, char** argv){
       free(path_ff);
       path_ff=NULL;
 
-      free(id);
+      //free(id);
       id=NULL;
       free(full_id);
       full_id=NULL;
@@ -198,7 +201,7 @@ int main(int argc, char** argv){
   FD=NULL;
 
 
-  DW=fopen(argv[2],"r");
+  DW=fopen(argv[3],"r");
 
   char* line=NULL;
   char* full_id_1=NULL;
@@ -219,13 +222,14 @@ int main(int argc, char** argv){
 
   line_size=getline(&line,&line_buf_size,DW);       //first line not a pair
 
-
-  while(line_size>=0){      //loop for each line
+  while(line_size>0){      //loop for each line
 
     if(v==0){               //skip first line
+      line_size=getline(&line,&line_buf_size,DW);   //get next line
       v=1;
       continue;
     }
+
 
     full_id_1=strtok(line,",");
     full_id_2=strtok(NULL,",");
@@ -269,9 +273,7 @@ int main(int argc, char** argv){
       complex2->Complex=complex1->Complex;
 
     }
-
     line_size=getline(&line,&line_buf_size,DW);   //get next line
-
 
   }
 

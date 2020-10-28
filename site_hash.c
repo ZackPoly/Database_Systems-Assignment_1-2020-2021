@@ -18,6 +18,7 @@ Hashed_Site insert_site_in_hash(Hash_For_Site SiteTable,char* site,int siteBucke
   if(search_site_in_hash(SiteTable,site,siteBucketsNum)!=NULL) return NULL ;
 
   int hashIndex=hash_func(site,siteBucketsNum);
+  int i ;
 
   /*                  EMPTY BUCKET LIST                     */
   if(SiteTable[hashIndex].root==NULL){
@@ -26,6 +27,9 @@ Hashed_Site insert_site_in_hash(Hash_For_Site SiteTable,char* site,int siteBucke
     SiteTable[hashIndex].root->site=malloc(strlen(site)+1) ;
     strcpy(SiteTable[hashIndex].root->site,site) ;
     SiteTable[hashIndex].root->Id_Hash_Array=malloc(idBucketsNum*sizeof(struct Ids_Bucket)) ;
+    for(i=0;i<idBucketsNum;i++){
+      SiteTable[hashIndex].root->Id_Hash_Array[i].root=NULL ;
+    }
 
     return SiteTable[hashIndex].root ;
   }
@@ -41,6 +45,9 @@ Hashed_Site insert_site_in_hash(Hash_For_Site SiteTable,char* site,int siteBucke
   currSite->next->site=malloc(strlen(site)+1) ;
   strcpy(currSite->next->site,site) ;
   currSite->next->Id_Hash_Array=malloc(idBucketsNum*sizeof(struct Ids_Bucket)) ;
+  for(i=0;i<idBucketsNum;i++){
+    currSite->next->Id_Hash_Array[i].root=NULL ;
+  }
 
   return currSite->next ;
 }
