@@ -43,6 +43,7 @@ Hashed_Id insert_id_in_hash(Hash_For_Id IdTable,int bucketsNum,char* full_id,cha
     IdTable[hashIndex].root->Complex=malloc(sizeof(struct Comp_node)) ;
     IdTable[hashIndex].root->Complex->id=malloc(strlen(full_id)+1) ;
     strcpy(IdTable[hashIndex].root->Complex->id,full_id) ;
+    IdTable[hashIndex].root->Complex->next=NULL ;
 
     return IdTable[hashIndex].root ;
   }
@@ -63,6 +64,7 @@ Hashed_Id insert_id_in_hash(Hash_For_Id IdTable,int bucketsNum,char* full_id,cha
   curId->next->Complex=malloc(sizeof(struct Comp_node)) ;
   curId->next->Complex->id=malloc(strlen(full_id)+1) ;
   strcpy(curId->next->Complex->id,full_id) ;
+  curId->next->Complex->next=NULL ;
 
   return curId->next ;
 }

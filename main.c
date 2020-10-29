@@ -6,10 +6,12 @@
 #include <unistd.h>
 #include <errno.h>
 
-
 #include "site_hash.h"
-// first arg DatasetX/ and second .csv file
 
+void print_complexes(Hash_For_Site,int,int,FILE*) ;
+
+
+//./main Datasets
 int main(int argc, char** argv){
 
   DIR* DD;
@@ -47,7 +49,6 @@ int main(int argc, char** argv){
       break ;
     }
   }
-  printf("%s\n",dataset_path );
 
   DIR* FD;
   DIR* SD;
@@ -146,7 +147,7 @@ int main(int argc, char** argv){
       strcat(path_ff,"/");
       strcat(path_ff,d_files->d_name);
 
-      printf("Path for file is : %s \n ",path_ff);
+      //printf("Path for file is : %s \n ",path_ff);
 
       JSON_file=fopen(path_ff,"r");             //open JSON file
 
@@ -165,8 +166,9 @@ int main(int argc, char** argv){
       if(data!=NULL){
 
         fread(data,length,1,JSON_file);       //store specs
+        data[length]='\0' ;
         insert_id_in_hash(currSite->Id_Hash_Array,idBucketsNum,full_id,data);
-        printf("data: %s",data);
+
 
       }
 
@@ -207,8 +209,6 @@ int main(int argc, char** argv){
   char* full_id_1=NULL;
   char* full_id_2=NULL;
   char* match=NULL;
-  char*site1=NULL;
-  char* site2=NULL;
   char* cid=NULL;
 
   Hashed_Id complex1=NULL;
@@ -234,14 +234,19 @@ int main(int argc, char** argv){
     full_id_1=strtok(line,",");
     full_id_2=strtok(NULL,",");
     match=strtok(NULL,",");
+    match=strtok(match,"\n");
 
-    if(strcmp(match,"1")==0){
+    if(strcmp(match,"1")==0 && strcmp(full_id_1,full_id_2)!=0){
 
-      get_site_from_id(site1,full_id_1);
-      get_site_from_id(site2,full_id_2);
 
       complex1=search_complex(site_hash_table,siteBucketsNum,idBucketsNum,full_id_1);
       complex2=search_complex(site_hash_table,siteBucketsNum,idBucketsNum,full_id_2);
+
+      if(complex1->Complex==complex2->Complex){
+        line_size=getline(&line,&line_buf_size,DW);
+
+        continue ;
+      }
 
       tmp1=complex1->Complex;
 
@@ -253,18 +258,14 @@ int main(int argc, char** argv){
 
       tmp1=complex2->Complex;
 
-      while(1){
+      while(tmp1!=NULL){
 
-        if(tmp1==NULL){
-          break;
+
+        if(strcmp(full_id_2,tmp1->id)!=0){
+
+          tmp_complex=search_complex(site_hash_table,siteBucketsNum,idBucketsNum,tmp1->id);
+          tmp_complex->Complex=complex1->Complex;
         }
-
-        if(strcmp(full_id_2,tmp1->id)==0){
-          continue;
-        }
-
-        tmp_complex=search_complex(site_hash_table,siteBucketsNum,idBucketsNum,tmp1->id);
-        tmp_complex->Complex=complex1->Complex;
 
         tmp1=tmp1->next;
 
@@ -277,10 +278,47 @@ int main(int argc, char** argv){
 
   }
 
+  chdir("..") ;
 
+  FILE* Output;
+  Output=fopen("Output.csv","w") ;
+  fprintf(Output, "%s,%s\n","left_spec_id","right_spec_id" );
+  print_complexes(site_hash_table,siteBucketsNum,idBucketsNum,Output) ;
   //print result in a new csv file
 
 
   return 0;
 
+}
+
+void print_complexes(Hash_For_Site SiteTable,int siteBucketsNum,int idBucketsNum,FILE* Output){
+  Hashed_Site tempSite ;
+  Hashed_Id tempId ;
+  complex tempComp ;
+  int i,j,k=0 ;
+
+  for(i=0;i<siteBucketsNum;i++){
+    tempSite=SiteTable[i].root ;
+
+    while(tempSite!=NULL){
+      for(j=0;j<idBucketsNum;j++){
+        tempId=tempSite->Id_Hash_Array[j].root ;
+
+        while(tempId!=NULL){
+          tempComp=tempId->Complex ;
+          while(tempComp!=NULL){
+            if(k==1) fprintf(Output, "%s,%s\n",tempId->full_id,tempComp->id );
+            if(!strcmp(tempId->full_id,tempComp->id)) k=1 ;
+
+            tempComp=tempComp->next ;
+          }
+          k=0 ;
+
+          tempId=tempId->next ;
+        }
+      }
+
+      tempSite=tempSite->next ;
+    }
+  }
 }
