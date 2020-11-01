@@ -4,3 +4,8 @@ struct Comp_node{
 
   complex next ;
 };
+
+typedef struct Head_Of_Complex* comp_head ;
+struct Head_Of_Complex{
+  complex head ;
+};

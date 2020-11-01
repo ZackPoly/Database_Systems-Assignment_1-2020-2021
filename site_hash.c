@@ -81,3 +81,65 @@ void get_site_from_id(char* site,const char* full_id){
 
   site=strtok(str,s);
 }
+
+
+void delete(Hash_For_Site SiteTable,int siteBucketsNum,int idBucketsNum){
+
+  int i=0,j=0;
+  Hashed_Site tmp_site=NULL;
+  Hashed_Site tmp_site2=NULL;
+  Hash_For_Id tmp_id_bucket=NULL;
+  Hashed_Id tmp_id=NULL;
+  Hashed_Id tmp_id2=NULL;
+  specs tmp_spec=NULL;
+  specs tmp_spec2=NULL;
+
+  for(i=0;i<siteBucketsNum;i++){                         //delete each site_bucket
+
+    tmp_site=SiteTable[i].root;
+
+    while(tmp_site!=NULL){                              //delete each site from a site_bucket
+
+      tmp_site2=tmp_site->next;
+
+      free(tmp_site->site);
+      tmp_site->site=NULL;
+
+      tmp_id_bucket=tmp_site->Id_Hash_Array;
+
+      for(j=0;j<idBucketsNum;j++){                    //delete each id_bucket from a site
+
+        tmp_id=tmp_id_bucket[j].root;
+
+        while(tmp_id!=NULL){                           //delete each id from an id_bucket
+
+          tmp_id2=tmp_id->next;
+
+          delete_specs_list(tmp_id) ;      //delete specs list
+
+          delete_complex_node(tmp_id);        //delete complex node from the complex
+
+          free(tmp_id->full_id);
+          tmp_id->full_id=NULL;
+          free(tmp_id);
+          tmp_id=tmp_id2;
+
+        }
+
+
+      }
+
+      free(tmp_id_bucket);
+      tmp_id_bucket=NULL;
+
+      free(tmp_site);
+      tmp_site=tmp_site2;
+
+    }
+
+  }
+
+  free(SiteTable);
+  SiteTable=NULL;
+
+}

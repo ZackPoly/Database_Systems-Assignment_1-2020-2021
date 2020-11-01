@@ -1,34 +1,17 @@
-#include "specs_list.h"
-#include "complex.h"
-
-#include <stdio.h>
-#include <stdlib.h>
-#include <string.h>
-#include <sys/types.h>
-#include <dirent.h>
-#include <unistd.h>
-#include <errno.h>
-
-// struct for list of ids of same bucket
-typedef struct Hash_For_Id_Entry* Hashed_Id ;
-struct Hash_For_Id_Entry{
-  char* full_id ;
-
-  specs Specs ;
-  complex Complex ;
-
-  Hashed_Id next ;
-};
-
-// struct for bucket of hash table for full ids.
-typedef struct Ids_Bucket* Hash_For_Id;
-struct Ids_Bucket{
-  Hashed_Id root ;
-};
+#include "hash.h"
 
 int hash_func(char*,int) ;
 
 Hashed_Id search_id_in_hash(Hash_For_Id,char*,int) ;
 
                                     //  id   file-data
-Hashed_Id insert_id_in_hash(Hash_For_Id,int,char*,char*) ;
+Hashed_Id insert_id_in_hash(Hash_For_Id,int,char*,FILE*) ;
+
+
+void delete_complex_node(Hashed_Id) ;
+
+void delete_specs_list(Hashed_Id) ;
+
+specs new_attribute(Hashed_Id,char*) ;
+
+void push_value(specs,char*) ;

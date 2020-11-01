@@ -1,11 +1,3 @@
-#include <stdio.h>
-#include <stdlib.h>
-#include <string.h>
-#include <sys/types.h>
-#include <dirent.h>
-#include <unistd.h>
-#include <errno.h>
-
 #include "site_hash.h"
 
 void print_complexes(Hash_For_Site,int,int,FILE*) ;
@@ -49,6 +41,7 @@ int main(int argc, char** argv){
       break ;
     }
   }
+  closedir(DD);
 
   DIR* FD;
   DIR* SD;
@@ -75,6 +68,7 @@ int main(int argc, char** argv){
   char* path_ff=NULL;
 
   FD=opendir(dataset_path);                                      //open camera_specs/ directory
+  free(dataset_path);
 
   if (FD==NULL){                                            //check if directory is open
     printf("Can't open directory!\n");
@@ -158,6 +152,8 @@ int main(int argc, char** argv){
 
       }
 
+
+      /*
       fseek(JSON_file,0,SEEK_END);            //go to the end of file
       length=ftell(JSON_file);                //how many bytes
       fseek(JSON_file,0,SEEK_SET);            //go to the beggining of file
@@ -171,6 +167,9 @@ int main(int argc, char** argv){
 
 
       }
+      */
+
+      insert_id_in_hash(currSite->Id_Hash_Array,idBucketsNum,full_id,JSON_file);
 
       fclose(JSON_file);
       JSON_file=NULL;
@@ -248,15 +247,15 @@ int main(int argc, char** argv){
         continue ;
       }
 
-      tmp1=complex1->Complex;
+      tmp1=complex1->Complex->head;
 
       while(tmp1->next!=NULL){
         tmp1=tmp1->next;
       }
 
-      tmp1->next=complex2->Complex;
+      tmp1->next=complex2->Complex->head;
 
-      tmp1=complex2->Complex;
+      tmp1=complex2->Complex->head;
 
       while(tmp1!=NULL){
 
@@ -271,12 +270,15 @@ int main(int argc, char** argv){
 
       }
 
+      free(complex2->Complex) ;
       complex2->Complex=complex1->Complex;
 
     }
     line_size=getline(&line,&line_buf_size,DW);   //get next line
 
   }
+  free(line) ;
+  fclose(DW) ;
 
   chdir("..") ;
 
@@ -286,7 +288,8 @@ int main(int argc, char** argv){
   print_complexes(site_hash_table,siteBucketsNum,idBucketsNum,Output) ;
   //print result in a new csv file
 
-
+  delete(site_hash_table,siteBucketsNum,idBucketsNum) ;
+  fclose(Output) ;
   return 0;
 
 }
@@ -305,7 +308,7 @@ void print_complexes(Hash_For_Site SiteTable,int siteBucketsNum,int idBucketsNum
         tempId=tempSite->Id_Hash_Array[j].root ;
 
         while(tempId!=NULL){
-          tempComp=tempId->Complex ;
+          tempComp=tempId->Complex->head ;
           while(tempComp!=NULL){
             if(k==1) fprintf(Output, "%s,%s\n",tempId->full_id,tempComp->id );
             if(!strcmp(tempId->full_id,tempComp->id)) k=1 ;
