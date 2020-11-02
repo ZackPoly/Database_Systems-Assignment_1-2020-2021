@@ -5,3 +5,6 @@ test push
 mikrh allagh :)
 
 pull this.
+
+Finished with coding
+Documentation left.
