@@ -247,6 +247,10 @@ int main(int argc, char** argv){
         continue ;
       }
 
+      complex1->Complex->tail->next=complex2->Complex->head ;
+      complex1->Complex->tail=complex2->Complex->tail ;
+
+      /*
       tmp1=complex1->Complex->head;
 
       while(tmp1->next!=NULL){
@@ -254,6 +258,7 @@ int main(int argc, char** argv){
       }
 
       tmp1->next=complex2->Complex->head;
+      */
 
       tmp1=complex2->Complex->head;
 

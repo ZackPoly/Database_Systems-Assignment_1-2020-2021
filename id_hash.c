@@ -119,6 +119,7 @@ Hashed_Id insert_id_in_hash(Hash_For_Id IdTable,int bucketsNum,char* full_id,FIL
     IdTable[hashIndex].root->Complex->head->id=malloc(strlen(full_id)+1) ;
     strcpy(IdTable[hashIndex].root->Complex->head->id,full_id) ;
     IdTable[hashIndex].root->Complex->head->next=NULL ;
+    IdTable[hashIndex].root->Complex->tail=IdTable[hashIndex].root->Complex->head ;
 
     return IdTable[hashIndex].root ;
   }
@@ -143,6 +144,7 @@ Hashed_Id insert_id_in_hash(Hash_For_Id IdTable,int bucketsNum,char* full_id,FIL
   curId->next->Complex->head->id=malloc(strlen(full_id)+1) ;
   strcpy(curId->next->Complex->head->id,full_id) ;
   curId->next->Complex->head->next=NULL ;
+  curId->next->Complex->tail=curId->next->Complex->head ;
 
   return curId->next ;
 }
