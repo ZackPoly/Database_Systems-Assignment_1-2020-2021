@@ -53,11 +53,10 @@ Hashed_Site insert_site_in_hash(Hash_For_Site SiteTable,char* site,int siteBucke
 }
 
 Hashed_Id search_complex(Hash_For_Site SiteTable,int siteBucketsNum,int idBucketsNum,char* full_id){
-
-  char str[80] ;
+  char* str=malloc(strlen(full_id)+1) ;
   strcpy(str,full_id) ;
-  const char s[2]="//";
-  char* site;
+  const char s[3]="//";
+  char* site=NULL;
   site=strtok(str,s);
 
   /* get site and site bucket node*/
@@ -68,6 +67,7 @@ Hashed_Id search_complex(Hash_For_Site SiteTable,int siteBucketsNum,int idBucket
   Hashed_Id currId=search_id_in_hash(currSite->Id_Hash_Array,full_id,idBucketsNum) ;
   if(currSite==NULL) return NULL ;      // that shouldnt happen
 
+  free(str) ;
   // return &(currId->Complex) ;
   return currId ;
 }
@@ -76,10 +76,11 @@ Hashed_Id search_complex(Hash_For_Site SiteTable,int siteBucketsNum,int idBucket
 // Test with NULL and not NULL site
 void get_site_from_id(char* site,const char* full_id){
   char str[80] ;
+  char* str1=NULL ;
   strcpy(str,full_id) ;
   const char s[2]="//";
 
-  site=strtok(str,s);
+  str1=strtok(str,s);
 }
 
 

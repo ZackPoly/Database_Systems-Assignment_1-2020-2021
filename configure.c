@@ -79,7 +79,6 @@ int main(int argc, char** argv){
   free(complex2->Complex) ;
   complex2->Complex=complex1->Complex;
   /////////////////////////// ALLAGH KLIKAS ///////////////////////////
-  printf("%s\n","OK" );
 
   print_complexes(site_hash_table,siteBucketsNum,idBucketsNum) ;
   return 0 ;
