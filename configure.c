@@ -46,10 +46,11 @@ int main(int argc, char** argv){
 
   Hashed_Site currSite1=NULL;
   Hashed_Site currSite2=NULL;
-
+  printf("%s\n","hmm1" );
   currSite1=insert_site_in_hash(site_hash_table,"www0.TestSite.com",siteBucketsNum,idBucketsNum);
-
+  printf("%s\n","hmm2" );
   FILE* JSON_file=fopen("4233.json","r");
+  printf("%s\n","hmm3" );
   insert_id_in_hash(currSite1->Id_Hash_Array,idBucketsNum,"www0.TestSite.com//4233",JSON_file);
   insert_id_in_hash(currSite1->Id_Hash_Array,idBucketsNum,"www0.TestSite.com//4233",JSON_file); // duplicate
 
@@ -78,6 +79,7 @@ int main(int argc, char** argv){
   free(complex2->Complex) ;
   complex2->Complex=complex1->Complex;
   /////////////////////////// ALLAGH KLIKAS ///////////////////////////
+  printf("%s\n","OK" );
 
   print_complexes(site_hash_table,siteBucketsNum,idBucketsNum) ;
   return 0 ;
