@@ -69,7 +69,7 @@ int main(int argc, char** argv){
   complex1->Complex->tail=complex2->Complex->tail ;
   tmp1=complex2->Complex->head;
   while(tmp1!=NULL){
-    if(strcmp(full_id_2,tmp1->id)!=0){
+    if(strcmp("www1.TestSiteG4.com//4233",tmp1->id)!=0){
       tmp_complex=search_complex(site_hash_table,siteBucketsNum,idBucketsNum,tmp1->id);
       tmp_complex->Complex=complex1->Complex;
     }
