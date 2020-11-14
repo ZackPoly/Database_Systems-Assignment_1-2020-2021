@@ -1,9 +1,11 @@
 #include "site_hash.h"
 
+// function that scans the hash tables and prints
+// pairs in file given as parameter
 void print_complexes(Hash_For_Site,int,int,FILE*) ;
 
 
-//./main Datasets
+//./main Datasets 2013_camera_specs < >.csv
 int main(int argc, char** argv){
 
   DIR* DD;
@@ -34,7 +36,7 @@ int main(int argc, char** argv){
     }
 
     if(!strcmp(main_dir->d_name,argv[2])){
-      dataset_path=malloc(strlen(main_dir->d_name)+2);        //dataset_path=camera_specs path
+      dataset_path=malloc(strlen(main_dir->d_name)+2);          //dataset_path=camera_specs path
       strcpy(dataset_path,main_dir->d_name);
       //strcat(dataset_path,"/");
 
@@ -67,10 +69,10 @@ int main(int argc, char** argv){
   char* path=NULL;
   char* path_ff=NULL;
 
-  FD=opendir(dataset_path);                                      //open camera_specs/ directory
+  FD=opendir(dataset_path);                                     //open camera_specs/ directory
   free(dataset_path);
 
-  if (FD==NULL){                                            //check if directory is open
+  if (FD==NULL){                                                //check if directory is open
     printf("Can't open directory!\n");
     return 1;
   }
@@ -86,7 +88,7 @@ int main(int argc, char** argv){
   }
 
 
-  while((in_file=readdir(FD))!=NULL){                       //read all subdirectories (sites)
+  while((in_file=readdir(FD))!=NULL){                           //read all subdirectories (sites)
 
     if(strcmp(in_file->d_name,".")==0){
       continue;
@@ -108,10 +110,10 @@ int main(int argc, char** argv){
     strcpy(path,argv[2]) ;
     strcat(path,"/");
     strcat(path,in_file->d_name);
-    SD=opendir(path);                                         //open subdirectory
+    SD=opendir(path);                                           //open subdirectory
 
 
-    if(SD==NULL){                                            //check if it is open
+    if(SD==NULL){                                               //check if it is open
       printf("Can't open subdirectory!\n");
       return 1;
     }
@@ -143,32 +145,16 @@ int main(int argc, char** argv){
 
       //printf("Path for file is : %s \n ",path_ff);
 
-      JSON_file=fopen(path_ff,"r");             //open JSON file
+      JSON_file=fopen(path_ff,"r");                             //open JSON file
 
-      if(JSON_file==NULL){                              //check if it is open
+      if(JSON_file==NULL){                                      //check if it is open
 
         printf("Can't open JSON file! \n");
         return 1;
 
       }
-
-
-      /*
-      fseek(JSON_file,0,SEEK_END);            //go to the end of file
-      length=ftell(JSON_file);                //how many bytes
-      fseek(JSON_file,0,SEEK_SET);            //go to the beggining of file
-      data=malloc(length+1);
-
-      if(data!=NULL){
-
-        fread(data,length,1,JSON_file);       //store specs
-        data[length]='\0' ;
-        insert_id_in_hash(currSite->Id_Hash_Array,idBucketsNum,full_id,data);
-
-
-      }
-      */
-
+      
+                                                                // insert full_id in struct
       insert_id_in_hash(currSite->Id_Hash_Array,idBucketsNum,full_id,JSON_file);
 
       fclose(JSON_file);
@@ -219,12 +205,12 @@ int main(int argc, char** argv){
   int line_size=0;
   int v=0;
 
-  line_size=getline(&line,&line_buf_size,DW);       //first line not a pair
+  line_size=getline(&line,&line_buf_size,DW);                   // first line not a pair
 
-  while(line_size>0){      //loop for each line
+  while(line_size>0){                                           // loop for each line
 
-    if(v==0){               //skip first line
-      line_size=getline(&line,&line_buf_size,DW);   //get next line
+    if(v==0){                                                   // skip first line
+      line_size=getline(&line,&line_buf_size,DW);               // get next line
       v=1;
       continue;
     }
@@ -247,23 +233,13 @@ int main(int argc, char** argv){
         continue ;
       }
 
-      complex1->Complex->tail->next=complex2->Complex->head ;
+      complex1->Complex->tail->next=complex2->Complex->head ;   // update complex of full_id1
       complex1->Complex->tail=complex2->Complex->tail ;
-
-      /*
-      tmp1=complex1->Complex->head;
-
-      while(tmp1->next!=NULL){
-        tmp1=tmp1->next;
-      }
-
-      tmp1->next=complex2->Complex->head;
-      */
 
       tmp1=complex2->Complex->head;
 
-      while(tmp1!=NULL){
-
+      while(tmp1!=NULL){                                        // make complex of all full_id in complex 2
+                                                                // be the same as complex 1
 
         if(strcmp(full_id_2,tmp1->id)!=0){
 
@@ -279,7 +255,7 @@ int main(int argc, char** argv){
       complex2->Complex=complex1->Complex;
 
     }
-    line_size=getline(&line,&line_buf_size,DW);   //get next line
+    line_size=getline(&line,&line_buf_size,DW);                 // get next line
 
   }
   free(line) ;
@@ -287,13 +263,13 @@ int main(int argc, char** argv){
 
   chdir("..") ;
 
-  FILE* Output;
+  FILE* Output;                                                 // create csv for output
   Output=fopen("Output.csv","w") ;
   fprintf(Output, "%s,%s\n","left_spec_id","right_spec_id" );
   print_complexes(site_hash_table,siteBucketsNum,idBucketsNum,Output) ;
   //print result in a new csv file
 
-  delete(site_hash_table,siteBucketsNum,idBucketsNum) ;
+  delete(site_hash_table,siteBucketsNum,idBucketsNum) ;         // free all structs
   fclose(Output) ;
   return 0;
 
