@@ -1,4 +1,5 @@
 #include "site_hash.h"
+#include "bag_of_words.h"
 
 // function that scans the hash tables and prints
 // pairs in file given as parameter
@@ -82,13 +83,14 @@ int main(int argc, char** argv){
   site_hash_table=malloc(siteBucketsNum*sizeof(struct Sites_Bucket));
 
   int i=0;
+  int fileNum=0;
 
   for(i=0;i<siteBucketsNum;i++){
     site_hash_table[i].root=NULL;
   }
 
 
-  while((in_file=readdir(FD))!=NULL){                           //read all subdirectories (sites)
+  while((in_file=readdir(FD))!=NULL && fileNum<50){                           //read all subdirectories (sites)
 
     if(strcmp(in_file->d_name,".")==0){
       continue;
@@ -153,7 +155,7 @@ int main(int argc, char** argv){
         return 1;
 
       }
-      
+      fileNum++ ;
                                                                 // insert full_id in struct
       insert_id_in_hash(currSite->Id_Hash_Array,idBucketsNum,full_id,JSON_file);
 
@@ -184,93 +186,107 @@ int main(int argc, char** argv){
 
   }
 
+  printf("%d\n",fileNum );
+
   closedir(FD);
   FD=NULL;
 
+  BoW bow=NULL ;
+  bow=initialize_bow(site_hash_table,bow,fileNum,siteBucketsNum,idBucketsNum) ;
 
-  DW=fopen(argv[3],"r");
-
-  char* line=NULL;
-  char* full_id_1=NULL;
-  char* full_id_2=NULL;
-  char* match=NULL;
-  char* cid=NULL;
-
-  Hashed_Id complex1=NULL;
-  Hashed_Id complex2=NULL;
-  complex tmp1=NULL;
-  Hashed_Id tmp_complex=NULL;
-
-  size_t line_buf_size=0;
-  int line_size=0;
-  int v=0;
-
-  line_size=getline(&line,&line_buf_size,DW);                   // first line not a pair
-
-  while(line_size>0){                                           // loop for each line
-
-    if(v==0){                                                   // skip first line
-      line_size=getline(&line,&line_buf_size,DW);               // get next line
-      v=1;
-      continue;
-    }
-
-
-    full_id_1=strtok(line,",");
-    full_id_2=strtok(NULL,",");
-    match=strtok(NULL,",");
-    match=strtok(match,"\n");
-
-    if(strcmp(match,"1")==0 && strcmp(full_id_1,full_id_2)!=0){
-
-
-      complex1=search_complex(site_hash_table,siteBucketsNum,idBucketsNum,full_id_1);
-      complex2=search_complex(site_hash_table,siteBucketsNum,idBucketsNum,full_id_2);
-
-      if(complex1->Complex==complex2->Complex){
-        line_size=getline(&line,&line_buf_size,DW);
-
-        continue ;
-      }
-
-      complex1->Complex->tail->next=complex2->Complex->head ;   // update complex of full_id1
-      complex1->Complex->tail=complex2->Complex->tail ;
-
-      tmp1=complex2->Complex->head;
-
-      while(tmp1!=NULL){                                        // make complex of all full_id in complex 2
-                                                                // be the same as complex 1
-
-        if(strcmp(full_id_2,tmp1->id)!=0){
-
-          tmp_complex=search_complex(site_hash_table,siteBucketsNum,idBucketsNum,tmp1->id);
-          tmp_complex->Complex=complex1->Complex;
-        }
-
-        tmp1=tmp1->next;
-
-      }
-
-      free(complex2->Complex) ;
-      complex2->Complex=complex1->Complex;
-
-    }
-    line_size=getline(&line,&line_buf_size,DW);                 // get next line
-
-  }
-  free(line) ;
-  fclose(DW) ;
-
-  chdir("..") ;
-
-  FILE* Output;                                                 // create csv for output
-  Output=fopen("Output.csv","w") ;
-  fprintf(Output, "%s,%s\n","left_spec_id","right_spec_id" );
-  print_complexes(site_hash_table,siteBucketsNum,idBucketsNum,Output) ;
-  //print result in a new csv file
-
+  // DW=fopen(argv[3],"r");
+  //
+  // char* line=NULL;
+  // char* full_id_1=NULL;
+  // char* full_id_2=NULL;
+  // char* match=NULL;
+  // char* cid=NULL;
+  //
+  // Hashed_Id id_entry1=NULL;
+  // Hashed_Id id_entry2=NULL;
+  // complex tmp1=NULL;
+  // Hashed_Id tmp_complex=NULL;
+  //
+  // size_t line_buf_size=0;
+  // int line_size=0;
+  // int v=0;
+  //
+  // line_size=getline(&line,&line_buf_size,DW);                   // first line not a pair
+  //
+  // while(line_size>0){                                           // loop for each line
+  //
+  //   if(v==0){                                                   // skip first line
+  //     line_size=getline(&line,&line_buf_size,DW);               // get next line
+  //     v=1;
+  //     continue;
+  //   }
+  //
+  //
+  //   full_id_1=strtok(line,",");
+  //   full_id_2=strtok(NULL,",");
+  //   match=strtok(NULL,",");
+  //   match=strtok(match,"\n");
+  //
+  //   if(strcmp(match,"1")==0 && strcmp(full_id_1,full_id_2)!=0){
+  //
+  //
+  //     id_entry1=search_complex(site_hash_table,siteBucketsNum,idBucketsNum,full_id_1);
+  //     id_entry2=search_complex(site_hash_table,siteBucketsNum,idBucketsNum,full_id_2);
+  //
+  //     if(id_entry1->Complex==id_entry2->Complex){
+  //       line_size=getline(&line,&line_buf_size,DW);
+  //
+  //       continue ;
+  //     }
+  //
+  //     id_entry1->Complex->tail->next=id_entry2->Complex->head ;   // update complex of full_id1
+  //     id_entry1->Complex->tail=id_entry2->Complex->tail ;
+  //
+  //     tmp1=id_entry2->Complex->head;
+  //
+  //     while(tmp1!=NULL){                                        // make complex of all full_id in complex 2
+  //                                                               // be the same as complex 1
+  //
+  //       if(strcmp(full_id_2,tmp1->id)!=0){
+  //
+  //         tmp_complex=search_complex(site_hash_table,siteBucketsNum,idBucketsNum,tmp1->id);
+  //         tmp_complex->Complex=id_entry1->Complex;
+  //       }
+  //
+  //       tmp1=tmp1->next;
+  //
+  //     }
+  //
+  //     delete_negatives(id_entry2->Complex) ;
+  //     free(id_entry2->Complex) ;
+  //     id_entry2->Complex=id_entry1->Complex;
+  //
+  //   }
+  //   else if(strcmp(match,"0")==0 && strcmp(full_id_1,full_id_2)!=0){
+  //
+  //
+  //     id_entry1=search_complex(site_hash_table,siteBucketsNum,idBucketsNum,full_id_1);
+  //     id_entry2=search_complex(site_hash_table,siteBucketsNum,idBucketsNum,full_id_2);
+  //
+  //     append_negative(id_entry1,id_entry2) ;
+  //   }
+  //
+  //   line_size=getline(&line,&line_buf_size,DW);                 // get next line
+  //
+  // }
+  // free(line) ;
+  // fclose(DW) ;
+  //
+  // chdir("..") ;
+  //
+  // FILE* Output;                                                 // create csv for output
+  // Output=fopen("Output.csv","w") ;
+  // fprintf(Output, "%s,%s\n","left_spec_id","right_spec_id" );
+  // print_complexes(site_hash_table,siteBucketsNum,idBucketsNum,Output) ;
+  // //print result in a new csv file
+  //
+  // fclose(Output) ;
   delete(site_hash_table,siteBucketsNum,idBucketsNum) ;         // free all structs
-  fclose(Output) ;
   return 0;
 
 }
