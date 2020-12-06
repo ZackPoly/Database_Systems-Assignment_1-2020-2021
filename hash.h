@@ -39,3 +39,7 @@ typedef struct Sites_Bucket* Hash_For_Site;
 struct Sites_Bucket{
   Hashed_Site root ;
 };
+
+int hash_func(char*,int) ;
+
+void trim(char*) ;

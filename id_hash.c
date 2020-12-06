@@ -120,6 +120,7 @@ Hashed_Id insert_id_in_hash(Hash_For_Id IdTable,int bucketsNum,char* full_id,FIL
     strcpy(IdTable[hashIndex].root->Complex->head->id,full_id) ;
     IdTable[hashIndex].root->Complex->head->next=NULL ;
     IdTable[hashIndex].root->Complex->tail=IdTable[hashIndex].root->Complex->head ;
+    IdTable[hashIndex].root->Complex->head_neg=NULL ;
 
     return IdTable[hashIndex].root ;
   }
@@ -145,10 +146,69 @@ Hashed_Id insert_id_in_hash(Hash_For_Id IdTable,int bucketsNum,char* full_id,FIL
   strcpy(curId->next->Complex->head->id,full_id) ;
   curId->next->Complex->head->next=NULL ;
   curId->next->Complex->tail=curId->next->Complex->head ;
+  curId->next->Complex->head_neg=NULL ;
 
   return curId->next ;
 }
 
+
+void append_negative(Hashed_Id id_entry1, Hashed_Id id_entry2){
+  neg_corr currNeg=id_entry1->Complex->head_neg ;
+
+  if(id_entry1->Complex->head_neg==NULL){
+    id_entry1->Complex->head_neg=malloc(sizeof(struct Negative_Correlation)) ;
+    id_entry1->Complex->head_neg->next=NULL ;
+    id_entry1->Complex->head_neg->corr=id_entry2->Complex ;
+
+  }
+  else{
+    while(currNeg->next!=NULL){
+      if(currNeg->corr==id_entry2->Complex)                                   // if negative already exists
+        return ;
+
+      currNeg=currNeg->next ;
+    }
+    currNeg->next=malloc(sizeof(struct Negative_Correlation)) ;
+    currNeg->next->next=NULL ;
+    currNeg->next->corr=id_entry2->Complex ;
+
+  }
+
+  currNeg=id_entry2->Complex->head_neg ;
+
+  if(id_entry2->Complex->head_neg==NULL){
+    id_entry2->Complex->head_neg=malloc(sizeof(struct Negative_Correlation)) ;
+    id_entry2->Complex->head_neg->next=NULL ;
+    id_entry2->Complex->head_neg->corr=id_entry1->Complex ;
+
+  }
+  else{
+    while(currNeg->next!=NULL){
+      if(currNeg->corr==id_entry1->Complex)                                   // if negative already exists
+        return ;
+
+      currNeg=currNeg->next ;
+    }
+    currNeg->next=malloc(sizeof(struct Negative_Correlation)) ;
+    currNeg->next->next=NULL ;
+    currNeg->next->corr=id_entry1->Complex ;
+
+  }
+}
+
+
+void delete_negatives(comp_head Complex){
+  neg_corr tmp_neg1=Complex->head_neg ;
+  neg_corr tmp_neg2=NULL ;
+
+  while(tmp_neg1!=NULL){                                  // delete negative correlations
+    tmp_neg2=tmp_neg1->next ;
+    free(tmp_neg1) ;
+    tmp_neg1=NULL ;
+    tmp_neg1=tmp_neg2 ;
+  }
+  Complex->head_neg=NULL ;
+}
 
 // this function deletes one id from its complex
 // knowing that a complex has at least one non-NULL node
@@ -177,7 +237,10 @@ void delete_complex_node(Hashed_Id IdNode){
   }
 
   if(IdNode->Complex->head==NULL){
+    delete_negatives(IdNode->Complex) ;
+
     free(IdNode->Complex) ;
+    IdNode->Complex=NULL ;
   }
 
 }
@@ -185,6 +248,10 @@ void delete_complex_node(Hashed_Id IdNode){
 
 /*----------specs_list funcs implementations---------*/
 specs new_attribute(Hashed_Id IdNode,char* attr){
+  // attr[0]=' ' ;
+  // attr[strlen(attr)-1]=' ' ;
+  trim(attr) ;
+
   specs currSpec=IdNode->Specs ;
 
   if(IdNode->Specs==NULL){
@@ -210,6 +277,10 @@ specs new_attribute(Hashed_Id IdNode,char* attr){
 }
 
 void push_value(specs spec,char* value){
+  // value[0]=' ' ;
+  // value[strlen(value)-1]=' ' ;
+  trim(value) ;
+
   str_list currVal=spec->values ;
   if(value[strlen(value)-1]==',') value[strlen(value)-1]='\0' ;
 
