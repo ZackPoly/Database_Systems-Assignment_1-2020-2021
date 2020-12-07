@@ -1,5 +1,5 @@
 #define BOW_B_NUM 1001
-#define BOW_STEP 100
+#define BOW_STEP 1000
 
 // typedef struct Hash_For_Id_Entry* Hashed_Id ;
 // struct Hash_For_Id_Entry ;
@@ -39,13 +39,17 @@ struct Bag_Of_Words{
   Hash_For_Word dict ;
   int dict_len ;
 
+  char** full_id_array ;
+
   float** values ;
+
   int bow_len ;
+  int filesNum ;
 };
 
-Hashed_Word search_word_in_hash(Hash_For_Word,char*,int) ;
+Hashed_Word search_word_in_hash(Hash_For_Word,char*,int*) ;
 
 
-Hashed_Word insert_word_in_hash(BoW,char*,int) ;
+int insert_word_in_hash(BoW,char*) ;
 
-BoW initialize_bow(Hash_For_Site,BoW,int,int,int) ;
+void initialize_bow(Hash_For_Site,BoW*,int,int,int) ;
