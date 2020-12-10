@@ -2,6 +2,22 @@
 #include "hash.h"
 #include <ctype.h>
 
+const char * stopwords[] = {
+    "a","able","about","across","after","all","almost","also","am","among","an",
+    "and","any","are","as","at","be","because","been","but","by","can","cannot",
+    "could","dear","did","do","does","either","else","ever","every","for","from",
+    "get","got","had","has","have","he","her","hers","him","his","how","however",
+    "i","if","in","into","is","it","its","just","least","let","like","likely",
+    "may","me","might","most","must","my","neither","no","nor","not","of","off",
+    "often","on","only","or","other","our","own","rather","said","say","says",
+    "she","should","since","so","some","than","that","the","their","them","then",
+    "there","these","they","this","tis","to","too","twas","us","wants","was",
+    "we","were","what","when","where","which","while","who","whom","why","will",
+    "with","would","yet","you","your",
+};
+
+#define n_stop_words (sizeof (stopwords) / sizeof (const char *))
+
 void preprocess(char* value){
   int i ;
   for(i=0 ; i<strlen(value) ; i++){
@@ -14,6 +30,28 @@ void preprocess(char* value){
     else if(isspace(value[i]))
       value[i]=' ' ;
   }
+}
+
+int is_stopword(char* word){
+  int a = 0 ;
+  int b = n_stop_words ;
+  int c ;
+  int comp ;
+
+  while(a < b){
+    c = (b + a) / 2 ;
+
+    comp = strcmp(word, stopwords[c]) ;
+    if(comp == 0)
+      return 1 ;
+    else if(comp < 0)
+      b = c - 1 ;
+    else if(comp > 0)
+      a = c + 1 ;
+
+  }
+
+  return 0 ;
 }
 
 Hashed_Word search_word_in_hash(Hash_For_Word WordTable,char* word,int* index){
@@ -145,8 +183,8 @@ void initialize_bow(Hash_For_Site SiteTable,BoW* bow,int filesNum,int siteBucket
               while(token){
                 trim(token) ;
 
-                if(strlen(token)>1){
-                  // IF NOT STOPWORD //
+                //if(strlen(token)>1){
+                if(!is_stopword(token)){
 
                   word_index=insert_word_in_hash(*bow,token) ;
                   (*bow)->values[vec_index][word_index]++ ;
