@@ -83,14 +83,14 @@ int main(int argc, char** argv){
   site_hash_table=malloc(siteBucketsNum*sizeof(struct Sites_Bucket));
 
   int i=0;
-  int fileNum=0;
+  int filesNum=0;
 
   for(i=0;i<siteBucketsNum;i++){
     site_hash_table[i].root=NULL;
   }
 
 
-  while((in_file=readdir(FD))!=NULL && fileNum<50){                           //read all subdirectories (sites)
+  while((in_file=readdir(FD))!=NULL){                           //read all subdirectories (sites)
 
     if(strcmp(in_file->d_name,".")==0){
       continue;
@@ -130,6 +130,7 @@ int main(int argc, char** argv){
         continue;
       }
 
+
       tmp=malloc(strlen(d_files->d_name)+1);
       strcpy(tmp,d_files->d_name);
 
@@ -155,9 +156,16 @@ int main(int argc, char** argv){
         return 1;
 
       }
-      fileNum++ ;
+
+      // if(filesNum<1){
+      //   insert_id_in_hash(currSite->Id_Hash_Array,idBucketsNum,full_id,JSON_file);
+      //
+      //   filesNum++ ;
+      // }
                                                                 // insert full_id in struct
       insert_id_in_hash(currSite->Id_Hash_Array,idBucketsNum,full_id,JSON_file);
+
+      filesNum++ ;
 
       fclose(JSON_file);
       JSON_file=NULL;
@@ -186,13 +194,22 @@ int main(int argc, char** argv){
 
   }
 
-  printf("%d\n",fileNum );
+  printf("%d\n",filesNum );
 
   closedir(FD);
   FD=NULL;
 
   BoW bow=NULL ;
-  bow=initialize_bow(site_hash_table,bow,fileNum,siteBucketsNum,idBucketsNum) ;
+  initialize_bow(site_hash_table,&bow,filesNum,siteBucketsNum,idBucketsNum) ;
+  printf("%d %d\n",bow->dict_len,bow->bow_len );
+  int bow_test,vec_test ;
+  for(bow_test=0 ; bow_test<1 ; bow_test++){
+    printf("%s\n",bow->full_id_array[bow_test] );
+    for(vec_test=0 ; vec_test<bow->dict_len ; vec_test++){
+      printf("%f ",bow->values[bow_test][vec_test] );
+    }
+    printf("\n");
+  }
 
   // DW=fopen(argv[3],"r");
   //
@@ -227,7 +244,7 @@ int main(int argc, char** argv){
   //   match=strtok(NULL,",");
   //   match=strtok(match,"\n");
   //
-  //   if(strcmp(match,"1")==0 && strcmp(full_id_1,full_id_2)!=0){
+  //   if(strcmp(match,"1")==0 && strcmp(full_id_1,full_id_2)!=0){                //if the products are same
   //
   //
   //     id_entry1=search_complex(site_hash_table,siteBucketsNum,idBucketsNum,full_id_1);
@@ -257,7 +274,7 @@ int main(int argc, char** argv){
   //
   //     }
   //
-  //     delete_negatives(id_entry2->Complex) ;
+  //     change_negatives(id_entry1->Complex,id_entry2->Complex) ;
   //     free(id_entry2->Complex) ;
   //     id_entry2->Complex=id_entry1->Complex;
   //

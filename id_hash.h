@@ -9,6 +9,8 @@ void append_negative(Hashed_Id, Hashed_Id) ;
 
 void delete_negatives(comp_head) ;
 
+void change_negatives(comp_head,comp_head);
+
 void delete_complex_node(Hashed_Id) ;
 
 void delete_specs_list(Hashed_Id) ;

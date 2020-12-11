@@ -210,6 +210,72 @@ void delete_negatives(comp_head Complex){
   Complex->head_neg=NULL ;
 }
 
+void change_negatives(comp_head Complex1,comp_head Complex2){
+
+  neg_corr tmp_neg_corr1=NULL;
+  neg_corr tmp_neg_corr2=NULL;
+  neg_corr tmp_neg_corr3=NULL;
+
+
+  tmp_neg_corr1=Complex2->head_neg;
+  tmp_neg_corr2=NULL;
+  tmp_neg_corr3=NULL;
+
+  while(tmp_neg_corr1!=NULL){                                                   //update negative correlations of Complex2 so that has not complexes that they have already negative correlation with Complex1
+      tmp_neg_corr2=tmp_neg_corr1->corr->head_neg;
+      if(tmp_neg_corr2->corr=Complex1){
+        Complex2->head_neg=tmp_neg_corr1->next;
+        tmp_neg_corr1->corr=NULL;
+        tmp_neg_corr1->next=NULL;
+        free(tmp_neg_corr1);
+        tmp_neg_corr1=Complex2->head_neg;
+        tmp_neg_corr2=NULL;
+        continue;
+      }
+
+      tmp_neg_corr3=tmp_neg_corr2;
+      while(tmp_neg_corr2!=NULL){
+        if(tmp_neg_corr2->corr==Complex1){                                      //complex in negative correlations of Complex2 has already negative correlation with Complex1
+          tmp_neg_corr3->next=tmp_neg_corr2->next;                              //delete the node from the list that will be appended to Complex1 negative correlations
+          tmp_neg_corr2->corr=NULL;
+          tmp_neg_corr2->next=NULL;
+          free(tmp_neg_corr2);
+          tmp_neg_corr2=NULL;
+          break;
+        }else{
+          tmp_neg_corr3=tmp_neg_corr2;
+          tmp_neg_corr2=tmp_neg_corr2->next;
+        }
+      }
+
+      tmp_neg_corr1=tmp_neg_corr1->next;
+  }
+
+  tmp_neg_corr1=Complex2->head_neg;
+
+  while(tmp_neg_corr1!=NULL){                                                   //for each complex in updated negative correlations of Complex2,change the negative correlation to Complex1
+    tmp_neg_corr2=tmp_neg_corr1->corr->head_neg;
+    while(tmp_neg_corr2!=NULL){
+      if(tmp_neg_corr2->corr==Complex2){
+        tmp_neg_corr2->corr=Complex1;
+        break;
+      }
+      tmp_neg_corr2=tmp_neg_corr2->next;
+    }
+    tmp_neg_corr1=tmp_neg_corr1->next;
+  }
+
+  tmp_neg_corr1=Complex1->head_neg;
+
+  while(tmp_neg_corr1->next!=NULL){                                             //go to the last complex (node) of the negative correlations of Complex1
+    tmp_neg_corr1=tmp_neg_corr1->next;
+  }
+
+  tmp_neg_corr1->next=Complex2->head_neg;                                       //append the negative correlations of Complex2 to Complex1 negative correlations
+
+
+}
+
 // this function deletes one id from its complex
 // knowing that a complex has at least one non-NULL node
 void delete_complex_node(Hashed_Id IdNode){
