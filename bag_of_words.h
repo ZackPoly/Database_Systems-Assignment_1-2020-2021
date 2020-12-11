@@ -9,6 +9,7 @@ typedef struct Dictionary_Word* Hashed_Word ;
 struct Dictionary_Word{
   char* word ;
   int index ;
+  int count ;
 
   Hashed_Word next ;
 };
@@ -24,9 +25,11 @@ struct Bag_Of_Words{
   Hash_For_Word dict ;
   int dict_len ;
 
-  char** full_id_array ;
+  // char** full_id_array ;
 
-  float** values ;
+  int* filesLen ;
+
+  double** values ;        // the vectors
 
   int bow_len ;
   int filesNum ;
@@ -38,3 +41,6 @@ Hashed_Word search_word_in_hash(Hash_For_Word,char*,int*) ;
 int insert_word_in_hash(BoW,char*) ;
 
 void initialize_bow(Hash_For_Site,BoW*,int,int,int) ;
+
+
+void bow_to_tf_idf(BoW bow) ;
