@@ -194,17 +194,20 @@ int main(int argc, char** argv){
 
   }
 
-  printf("%d\n",filesNum );
+  // printf("%d\n",filesNum );
 
   closedir(FD);
   FD=NULL;
 
   BoW bow=NULL ;
   initialize_bow(site_hash_table,&bow,filesNum,siteBucketsNum,idBucketsNum) ;
+
+  bow_to_tf_idf(bow) ;
+
   printf("%d %d\n",bow->dict_len,bow->bow_len );
   int bow_test,vec_test ;
   for(bow_test=0 ; bow_test<1 ; bow_test++){
-    printf("%s\n",bow->full_id_array[bow_test] );
+    // printf("%s\n",bow->full_id_array[bow_test] );
     for(vec_test=0 ; vec_test<bow->dict_len ; vec_test++){
       printf("%f ",bow->values[bow_test][vec_test] );
     }
