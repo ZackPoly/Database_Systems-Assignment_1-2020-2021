@@ -1,24 +1,9 @@
 #define BOW_B_NUM 1001
-#define BOW_STEP 100
+#define BOW_STEP 10000
 
-// typedef struct Hash_For_Id_Entry* Hashed_Id ;
-// struct Hash_For_Id_Entry ;
-//
-// typedef struct Ids_Bucket* Hash_For_Id;
-// struct Ids_Bucket ;
-//
-// typedef struct Hash_For_Site_Entry* Hashed_Site ;
-// struct Hash_For_Site_Entry ;
-//
+
 typedef struct Sites_Bucket* Hash_For_Site;
 struct Sites_Bucket ;
-//
-// typedef struct str_node* str_list ;
-// struct str_node ;
-//
-// typedef struct Spec_node* specs ;
-// struct Spec_node ;
-
 
 typedef struct Dictionary_Word* Hashed_Word ;
 struct Dictionary_Word{
@@ -39,13 +24,17 @@ struct Bag_Of_Words{
   Hash_For_Word dict ;
   int dict_len ;
 
+  char** full_id_array ;
+
   float** values ;
+
   int bow_len ;
+  int filesNum ;
 };
 
-Hashed_Word search_word_in_hash(Hash_For_Word,char*,int) ;
+Hashed_Word search_word_in_hash(Hash_For_Word,char*,int*) ;
 
 
-Hashed_Word insert_word_in_hash(BoW,char*,int) ;
+int insert_word_in_hash(BoW,char*) ;
 
-BoW initialize_bow(Hash_For_Site,BoW,int,int,int) ;
+void initialize_bow(Hash_For_Site,BoW*,int,int,int) ;
