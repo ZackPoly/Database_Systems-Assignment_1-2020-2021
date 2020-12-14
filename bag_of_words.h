@@ -1,5 +1,8 @@
+#include <ctype.h>
+#include <math.h>
+
 #define BOW_B_NUM 1001
-#define BOW_STEP 10000
+#define BOW_STEP 17000
 
 
 typedef struct Sites_Bucket* Hash_For_Site;
@@ -9,7 +12,6 @@ typedef struct Dictionary_Word* Hashed_Word ;
 struct Dictionary_Word{
   char* word ;
   int index ;
-  int count ;
 
   Hashed_Word next ;
 };
@@ -28,8 +30,9 @@ struct Bag_Of_Words{
   // char** full_id_array ;
 
   int* filesLen ;
+  int* wordsFileCount ;                 // in how many files each word appears
 
-  double** values ;        // the vectors
+  double** values ;                     // the vectors
 
   int bow_len ;
   int filesNum ;

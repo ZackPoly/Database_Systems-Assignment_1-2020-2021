@@ -10,3 +10,11 @@ Hashed_Id search_complex(Hash_For_Site,int,int,char*) ;
 void get_site_from_id(char*,const char*);
 
 void delete(Hash_For_Site,int,int);
+
+
+// function that scans the hash tables and prints
+// pairs in file given as parameter
+void print_complexes(Hash_For_Site,int,int,FILE*) ;
+
+
+void train_test_val_split(Hash_For_Site,int,int,FILE*,FILE*,FILE*) ;

@@ -95,7 +95,7 @@ Hashed_Id search_id_in_hash(Hash_For_Id IdTable,char* full_id,int bucketsNum){
   return NULL ;
 }
 
-Hashed_Id insert_id_in_hash(Hash_For_Id IdTable,int bucketsNum,char* full_id,FILE* JSON_file){
+Hashed_Id insert_id_in_hash(Hash_For_Id IdTable,int bucketsNum,char* full_id,FILE* JSON_file,int filesNum){
 
   /*                     DUPLICATE ID REJECTED                     */
   if(search_id_in_hash(IdTable,full_id,bucketsNum)!=NULL) return NULL ;
@@ -109,6 +109,8 @@ Hashed_Id insert_id_in_hash(Hash_For_Id IdTable,int bucketsNum,char* full_id,FIL
     IdTable[hashIndex].root->next=NULL ;
     IdTable[hashIndex].root->full_id=malloc(strlen(full_id)+1) ;
     strcpy(IdTable[hashIndex].root->full_id,full_id) ;
+    IdTable[hashIndex].root->tf_idf_index=filesNum ;
+
                       /* initialize Specs */
     IdTable[hashIndex].root->Specs=NULL ;
     initialize_specs(IdTable[hashIndex].root,JSON_file) ;
@@ -135,6 +137,8 @@ Hashed_Id insert_id_in_hash(Hash_For_Id IdTable,int bucketsNum,char* full_id,FIL
   curId->next->next=NULL ;
   curId->next->full_id=malloc(strlen(full_id)+1) ;
   strcpy(curId->next->full_id,full_id) ;
+  curId->next->tf_idf_index=filesNum ;
+
                       /* initialize Specs */
   curId->next->Specs=NULL ;
   initialize_specs(curId->next,JSON_file) ;
@@ -152,50 +156,61 @@ Hashed_Id insert_id_in_hash(Hash_For_Id IdTable,int bucketsNum,char* full_id,FIL
 }
 
 
-void append_negative(Hashed_Id id_entry1, Hashed_Id id_entry2){
-  neg_corr currNeg=id_entry1->Complex->head_neg ;
+void append_negative(comp_head Complex1,comp_head Complex2){
+  neg_corr currNeg=Complex1->head_neg ;
 
-  if(id_entry1->Complex->head_neg==NULL){
-    id_entry1->Complex->head_neg=malloc(sizeof(struct Negative_Correlation)) ;
-    id_entry1->Complex->head_neg->next=NULL ;
-    id_entry1->Complex->head_neg->corr=id_entry2->Complex ;
+  if(Complex1->head_neg==NULL){
+    Complex1->head_neg=malloc(sizeof(struct Negative_Correlation)) ;
+    Complex1->head_neg->next=NULL ;
+    Complex1->head_neg->corr=Complex2 ;
 
   }
   else{
     while(currNeg->next!=NULL){
-      if(currNeg->corr==id_entry2->Complex)                                   // if negative already exists
+      if(currNeg->corr==Complex2)                                   // if negative already exists
         return ;
 
       currNeg=currNeg->next ;
     }
     currNeg->next=malloc(sizeof(struct Negative_Correlation)) ;
     currNeg->next->next=NULL ;
-    currNeg->next->corr=id_entry2->Complex ;
+    currNeg->next->corr=Complex2 ;
 
   }
 
-  currNeg=id_entry2->Complex->head_neg ;
+  currNeg=Complex2->head_neg ;
 
-  if(id_entry2->Complex->head_neg==NULL){
-    id_entry2->Complex->head_neg=malloc(sizeof(struct Negative_Correlation)) ;
-    id_entry2->Complex->head_neg->next=NULL ;
-    id_entry2->Complex->head_neg->corr=id_entry1->Complex ;
+  if(Complex2->head_neg==NULL){
+    Complex2->head_neg=malloc(sizeof(struct Negative_Correlation)) ;
+    Complex2->head_neg->next=NULL ;
+    Complex2->head_neg->corr=Complex1 ;
 
   }
   else{
     while(currNeg->next!=NULL){
-      if(currNeg->corr==id_entry1->Complex)                                   // if negative already exists
+      if(currNeg->corr==Complex1)                                   // if negative already exists
         return ;
 
       currNeg=currNeg->next ;
     }
     currNeg->next=malloc(sizeof(struct Negative_Correlation)) ;
     currNeg->next->next=NULL ;
-    currNeg->next->corr=id_entry1->Complex ;
+    currNeg->next->corr=Complex1 ;
 
   }
 }
 
+int search_negative(comp_head Complex1,comp_head Complex2){
+
+  neg_corr tmp_neg_corr1=Complex1->head_neg;
+  while(tmp_neg_corr1!=NULL){
+    if(tmp_neg_corr1->corr==Complex2) return 1 ;
+
+    tmp_neg_corr1=tmp_neg_corr1->next;
+  }
+
+  return 0 ;
+}
 
 void delete_negatives(comp_head Complex){
   neg_corr tmp_neg1=Complex->head_neg ;
@@ -210,71 +225,169 @@ void delete_negatives(comp_head Complex){
   Complex->head_neg=NULL ;
 }
 
-void change_negatives(comp_head Complex1,comp_head Complex2){
+void delete_complex_from_list(comp_head Complex,comp_head ComplexToDel){
+
+  if(Complex->head_neg==NULL) return ;
 
   neg_corr tmp_neg_corr1=NULL;
   neg_corr tmp_neg_corr2=NULL;
-  neg_corr tmp_neg_corr3=NULL;
 
+  tmp_neg_corr1=Complex->head_neg->next;
+  tmp_neg_corr2=Complex->head_neg;
 
-  tmp_neg_corr1=Complex2->head_neg;
-  tmp_neg_corr2=NULL;
-  tmp_neg_corr3=NULL;
+  if(Complex->head_neg->corr==ComplexToDel){
 
-  while(tmp_neg_corr1!=NULL){                                                   //update negative correlations of Complex2 so that has not complexes that they have already negative correlation with Complex1
-      tmp_neg_corr2=tmp_neg_corr1->corr->head_neg;
-      if(tmp_neg_corr2->corr=Complex1){
-        Complex2->head_neg=tmp_neg_corr1->next;
-        tmp_neg_corr1->corr=NULL;
-        tmp_neg_corr1->next=NULL;
+    free(Complex->head_neg);
+
+    Complex->head_neg=tmp_neg_corr1;
+
+    return;
+  }
+
+  while(tmp_neg_corr1!=NULL){
+
+    if(tmp_neg_corr1->corr==ComplexToDel){
+
+        tmp_neg_corr2->next=tmp_neg_corr1->next;
+
         free(tmp_neg_corr1);
-        tmp_neg_corr1=Complex2->head_neg;
-        tmp_neg_corr2=NULL;
-        continue;
-      }
 
-      tmp_neg_corr3=tmp_neg_corr2;
-      while(tmp_neg_corr2!=NULL){
-        if(tmp_neg_corr2->corr==Complex1){                                      //complex in negative correlations of Complex2 has already negative correlation with Complex1
-          tmp_neg_corr3->next=tmp_neg_corr2->next;                              //delete the node from the list that will be appended to Complex1 negative correlations
-          tmp_neg_corr2->corr=NULL;
-          tmp_neg_corr2->next=NULL;
-          free(tmp_neg_corr2);
-          tmp_neg_corr2=NULL;
-          break;
-        }else{
-          tmp_neg_corr3=tmp_neg_corr2;
-          tmp_neg_corr2=tmp_neg_corr2->next;
-        }
-      }
-
-      tmp_neg_corr1=tmp_neg_corr1->next;
-  }
-
-  tmp_neg_corr1=Complex2->head_neg;
-
-  while(tmp_neg_corr1!=NULL){                                                   //for each complex in updated negative correlations of Complex2,change the negative correlation to Complex1
-    tmp_neg_corr2=tmp_neg_corr1->corr->head_neg;
-    while(tmp_neg_corr2!=NULL){
-      if(tmp_neg_corr2->corr==Complex2){
-        tmp_neg_corr2->corr=Complex1;
-        break;
-      }
-      tmp_neg_corr2=tmp_neg_corr2->next;
+        return;
     }
+
+    tmp_neg_corr2=tmp_neg_corr2->next;
     tmp_neg_corr1=tmp_neg_corr1->next;
+
   }
-
-  tmp_neg_corr1=Complex1->head_neg;
-
-  while(tmp_neg_corr1->next!=NULL){                                             //go to the last complex (node) of the negative correlations of Complex1
-    tmp_neg_corr1=tmp_neg_corr1->next;
-  }
-
-  tmp_neg_corr1->next=Complex2->head_neg;                                       //append the negative correlations of Complex2 to Complex1 negative correlations
-
 
 }
+
+void change_negatives(comp_head Complex1,comp_head Complex2){
+
+  neg_corr tmp_neg_corr1=Complex2->head_neg;
+  neg_corr tmp_neg_corr2=NULL;
+
+  while(tmp_neg_corr1!=NULL){
+    delete_complex_from_list(tmp_neg_corr1->corr,Complex2) ;
+    if(search_negative(tmp_neg_corr1->corr,Complex2)) printf("%s\n","TIII??" );
+    // append_negative(Complex1,tmp_neg_corr1->corr) ;
+
+    tmp_neg_corr1=tmp_neg_corr1->next ;
+  }
+
+  tmp_neg_corr2=Complex1->head_neg;
+  while(tmp_neg_corr1!=NULL){
+    if(search_negative(tmp_neg_corr1->corr,Complex2)) printf("%s\n","OUOU??" );
+    // append_negative(Complex1,tmp_neg_corr1->corr) ;
+
+    tmp_neg_corr1=tmp_neg_corr1->next ;
+  }
+
+}
+
+
+// void change_negatives(comp_head Complex1,comp_head Complex2){
+//
+//   if(Complex2->head_neg==NULL){
+//     return;
+//   }
+//
+//   neg_corr tmp_neg_corr1=NULL;
+//   neg_corr tmp_neg_corr2=NULL;
+//   neg_corr tmp_neg_corr3=NULL;
+//
+//   if(Complex1->head_neg!=NULL){                                                 // if complex 1 has negative correlations
+//     tmp_neg_corr1=Complex2->head_neg;
+//     tmp_neg_corr3=Complex2->head_neg;
+//
+//     int flag ;
+//
+//     while(tmp_neg_corr1!=NULL){                                                 // scan negative correlations of complex 2
+//
+//         tmp_neg_corr2=tmp_neg_corr1->corr->head_neg;
+//
+//         flag = 0 ;
+//
+//         while(tmp_neg_corr2!=NULL){                                             // scan negative correlations of neg. corr.
+//           if(tmp_neg_corr2->corr==Complex1){
+//
+//               delete_complex_from_list(tmp_neg_corr1->corr,Complex2) ;          // delete
+//
+//               if(Complex2->head_neg==tmp_neg_corr1){
+//                   Complex2->head_neg=tmp_neg_corr1->next;
+//                   tmp_neg_corr1->next=NULL;
+//                   tmp_neg_corr1->corr=NULL;
+//
+//                   free(tmp_neg_corr1);  printf("%s\n","deleted" );
+//
+//                   tmp_neg_corr1=Complex2->head_neg;
+//                   tmp_neg_corr3=Complex2->head_neg;
+//
+//               }else{
+//                 tmp_neg_corr3->next=tmp_neg_corr1->next;
+//                 tmp_neg_corr1->next=NULL;
+//                 tmp_neg_corr1->corr=NULL;
+//
+//                 free(tmp_neg_corr1);  printf("%s\n","deleted" );
+//
+//                 tmp_neg_corr1=tmp_neg_corr3->next;
+//
+//               }
+//
+//               flag = 1 ;
+//               break ;
+//           }
+//           else{
+//             tmp_neg_corr2=tmp_neg_corr2->next;
+//           }
+//         }
+//
+//         if(!flag){
+//           if(tmp_neg_corr3!=tmp_neg_corr1){
+//             tmp_neg_corr3=tmp_neg_corr3->next;
+//           }
+//
+//           tmp_neg_corr1=tmp_neg_corr1->next;
+//
+//         }
+//
+//     }
+//   }
+//
+//
+//   tmp_neg_corr1=Complex2->head_neg;
+//
+//   while(tmp_neg_corr1!=NULL){                                                   //for each complex in updated negative correlations of Complex2,change the negative correlation to Complex1
+//     tmp_neg_corr2=tmp_neg_corr1->corr->head_neg;
+//     while(tmp_neg_corr2!=NULL){
+//       if(tmp_neg_corr2->corr==Complex2){
+//         tmp_neg_corr2->corr=Complex1;
+//         break;
+//       }
+//       tmp_neg_corr2=tmp_neg_corr2->next;
+//     }
+//     tmp_neg_corr1=tmp_neg_corr1->next;
+//   }
+//
+//   if(Complex1->head_neg==NULL){
+//     Complex1->head_neg=Complex2->head_neg;
+//   }
+//   else{
+//     tmp_neg_corr1=Complex1->head_neg;
+//
+//     while(tmp_neg_corr1->next!=NULL){                                             //go to the last complex (node) of the negative correlations of Complex1
+//       tmp_neg_corr1=tmp_neg_corr1->next;
+//     }
+//
+//     tmp_neg_corr1->next=Complex2->head_neg;                                       //append the negative correlations of Complex2 to Complex1 negative correlations
+//   }
+//
+//   Complex2->head_neg=NULL;
+//
+//   return;
+//
+//
+// }
 
 // this function deletes one id from its complex
 // knowing that a complex has at least one non-NULL node

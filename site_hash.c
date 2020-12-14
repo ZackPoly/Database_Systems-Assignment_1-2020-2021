@@ -72,16 +72,7 @@ Hashed_Id search_complex(Hash_For_Site SiteTable,int siteBucketsNum,int idBucket
   return currId ;
 }
 
-// TODO
-// Test with NULL and not NULL site
-void get_site_from_id(char* site,const char* full_id){
-  char str[80] ;
-  char* str1=NULL ;
-  strcpy(str,full_id) ;
-  const char s[2]="//";
-
-  str1=strtok(str,s);
-}
+// search_neg_corr(Hash_For_Site SiteTable,int siteBucketsNum,int idBucketsNum,comp_head Complex)
 
 
 void delete(Hash_For_Site SiteTable,int siteBucketsNum,int idBucketsNum){
@@ -143,4 +134,117 @@ void delete(Hash_For_Site SiteTable,int siteBucketsNum,int idBucketsNum){
   free(SiteTable);
   SiteTable=NULL;
 
+}
+
+
+void print_complexes(Hash_For_Site SiteTable,int siteBucketsNum,int idBucketsNum,FILE* Output){
+  Hashed_Site tempSite ;
+  Hashed_Id tempId ;
+  complex tempComp ;
+  int i,j,k=0 ;
+
+  for(i=0;i<siteBucketsNum;i++){
+    tempSite=SiteTable[i].root ;
+
+    while(tempSite!=NULL){
+      for(j=0;j<idBucketsNum;j++){
+        tempId=tempSite->Id_Hash_Array[j].root ;
+
+        while(tempId!=NULL){
+          tempComp=tempId->Complex->head ;
+          while(tempComp!=NULL){
+            if(k==1) fprintf(Output, "%s,%s\n",tempId->full_id,tempComp->id );
+            if(!strcmp(tempId->full_id,tempComp->id)) k=1 ;
+
+            tempComp=tempComp->next ;
+          }
+          k=0 ;
+
+          tempId=tempId->next ;
+        }
+      }
+
+      tempSite=tempSite->next ;
+    }
+  }
+}
+
+void train_test_val_split(Hash_For_Site SiteTable,int siteBucketsNum,int idBucketsNum,FILE* Train,FILE* Test,FILE* Validation){
+  Hashed_Site tempSite ;
+  Hashed_Id tempId ;
+  Hashed_Id compId ;
+  complex tempComp ;
+  neg_corr tempNeg ;
+  int i,j,k=0 ;
+
+  srand(time(NULL)) ;
+  int fileSelect ;
+
+  for(i=0;i<siteBucketsNum;i++){
+    tempSite=SiteTable[i].root ;
+
+    while(tempSite!=NULL){
+      for(j=0;j<idBucketsNum;j++){
+        tempId=tempSite->Id_Hash_Array[j].root ;
+
+        while(tempId!=NULL){
+
+          tempComp=tempId->Complex->head ;
+
+          while(tempComp!=NULL){
+            if(k==1){
+              fileSelect=rand()%101 ;
+              if(fileSelect<60){
+                fprintf(Train, "%s,%s,%s\n",tempId->full_id,tempComp->id,"1" );
+              }
+              else if(fileSelect>=60 && fileSelect<80){
+                fprintf(Test, "%s,%s,%s\n",tempId->full_id,tempComp->id,"1" );
+              }
+              else{
+                fprintf(Validation, "%s,%s,%s\n",tempId->full_id,tempComp->id,"1" );
+              }
+
+            }
+            if(!strcmp(tempId->full_id,tempComp->id)) k=1 ;
+
+            tempComp=tempComp->next ;
+          }
+          k=0 ;
+
+          // tempNeg=tempId->Complex->head_neg ;
+          // while (tempNeg!=NULL) {
+          //
+          //   tempComp=tempNeg->corr->head ;
+          //
+          //   while(tempComp!=NULL){
+          //
+          //     compId=search_id_in_hash(tempSite->Id_Hash_Array,tempComp->id,idBucketsNum) ;
+          //
+          //     if(compId->tf_idf_index>tempId->tf_idf_index){
+          //
+          //       fileSelect=rand()%101 ;
+          //       if(fileSelect<60){
+          //         fprintf(Train, "%s,%s,%s\n",tempId->full_id,tempComp->id,"0" );
+          //       }
+          //       else if(fileSelect>=60 && fileSelect<80){
+          //         fprintf(Test, "%s,%s,%s\n",tempId->full_id,tempComp->id,"0" );
+          //       }
+          //       else{
+          //         fprintf(Validation, "%s,%s,%s\n",tempId->full_id,tempComp->id,"0" );
+          //       }
+          //     }
+          //
+          //     tempComp=tempComp->next ;
+          //   }
+          //
+          //   tempNeg=tempNeg->next ;
+          // }
+
+          tempId=tempId->next ;
+        }
+      }
+
+      tempSite=tempSite->next ;
+    }
+  }
 }

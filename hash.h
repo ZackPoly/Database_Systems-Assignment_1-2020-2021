@@ -8,6 +8,7 @@
 #include <dirent.h>
 #include <unistd.h>
 #include <errno.h>
+#include <time.h>
 
 // struct for list of ids of same bucket
 typedef struct Hash_For_Id_Entry* Hashed_Id ;
@@ -16,6 +17,8 @@ struct Hash_For_Id_Entry{
 
   specs Specs ;
   comp_head Complex ;
+
+  int tf_idf_index ;
 
   Hashed_Id next ;
 };

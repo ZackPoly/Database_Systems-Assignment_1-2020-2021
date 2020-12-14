@@ -1,7 +1,5 @@
 #include "bag_of_words.h"
 #include "hash.h"
-#include <ctype.h>
-#include <math.h>
 
 const char * stopwords[] = {
     "a","able","about","across","after","all","almost","also","am","among","an",
@@ -62,7 +60,7 @@ Hashed_Word search_word_in_hash(Hash_For_Word WordTable,char* word,int* index){
   while(currWord!=NULL){
     if(!strcmp(currWord->word,word)){
       *index=currWord->index ;
-      currWord->count++ ;
+
       return currWord ;
     }
 
@@ -86,7 +84,6 @@ int insert_word_in_hash(BoW bow,char* word){
     bow->dict[hashIndex].root->word=malloc(strlen(word)+1) ;
     strcpy(bow->dict[hashIndex].root->word,word) ;
     bow->dict[hashIndex].root->index=bow->dict_len ;
-    bow->dict[hashIndex].root->count=1 ;
 
   }
   else{
@@ -101,7 +98,6 @@ int insert_word_in_hash(BoW bow,char* word){
     currWord->next->word=malloc(strlen(word)+1) ;
     strcpy(currWord->next->word,word) ;
     currWord->next->index=bow->dict_len ;
-    currWord->next->count=1 ;
 
   }
 
@@ -111,7 +107,7 @@ int insert_word_in_hash(BoW bow,char* word){
   if(index>=bow->bow_len){    // expand bow vectors
     int i,j ;
     for(i=0 ; i<bow->filesNum ; i++){
-      bow->values[i]=realloc(bow->values[i],sizeof(float)*(bow->bow_len+BOW_STEP));
+      bow->values[i]=realloc(bow->values[i],sizeof(double)*(bow->bow_len+BOW_STEP));
 
       for(j=bow->bow_len ; j<(bow->bow_len+BOW_STEP) ; j++){
         bow->values[i][j]=0.0 ;
@@ -137,8 +133,11 @@ void initialize_bow(Hash_For_Site SiteTable,BoW* bow,int filesNum,int siteBucket
   (*bow)->bow_len=BOW_STEP ;
   (*bow)->filesNum=filesNum ;
 
-  // (*bow)->full_id_array=malloc(filesNum*sizeof(char*)) ;
+
   (*bow)->filesLen=malloc(filesNum*sizeof(int)) ;
+  for(i=0 ; i<filesNum ; i++){
+    (*bow)->filesLen[i]=0 ;
+  }
 
   for(i=0;i<BOW_B_NUM;i++){
     (*bow)->dict[i].root=NULL;
@@ -172,7 +171,7 @@ void initialize_bow(Hash_For_Site SiteTable,BoW* bow,int filesNum,int siteBucket
 
         while(tempId!=NULL){
 
-          word_count = 0 ;
+          // word_count = 0 ;
 
           // (*bow)->full_id_array[vec_index]=malloc(strlen(tempId->full_id)+1) ;
           // strcpy((*bow)->full_id_array[vec_index],tempId->full_id) ;
@@ -193,7 +192,7 @@ void initialize_bow(Hash_For_Site SiteTable,BoW* bow,int filesNum,int siteBucket
                 trim(token) ;
 
                 if(!is_stopword(token)){
-                  word_count++ ;
+                  (*bow)->filesLen[vec_index]++ ;
 
                   word_index=insert_word_in_hash(*bow,token) ;
                   (*bow)->values[vec_index][word_index]++ ;
@@ -209,8 +208,6 @@ void initialize_bow(Hash_For_Site SiteTable,BoW* bow,int filesNum,int siteBucket
             tempSpecs=tempSpecs->next ;
           }
 
-          (*bow)->filesLen[vec_index]=word_count ;
-
           vec_index++ ;
           tempId=tempId->next ;
         }
@@ -218,6 +215,11 @@ void initialize_bow(Hash_For_Site SiteTable,BoW* bow,int filesNum,int siteBucket
 
       tempSite=tempSite->next ;
     }
+  }
+
+  (*bow)->wordsFileCount=malloc((*bow)->dict_len*sizeof(int)) ;
+  for(i=0 ; i<(*bow)->dict_len ; i++){
+    (*bow)->wordsFileCount[i]=0 ;
   }
 }
 
@@ -227,9 +229,18 @@ void bow_to_tf_idf(BoW bow){
   for(i=0 ; i<bow->filesNum ; i++){
 
     for(j=0 ; j<bow->dict_len ; j++){
-      bow->values[i][j]=bow->values[i][j] / bow->filesLen[i] ;
+      if(bow->values[i][j]){
+        bow->wordsFileCount[j]++ ;
+
+        bow->values[i][j]=bow->values[i][j] / bow->filesLen[i] ;
+      }
+
     }
   }
+
+  // drop words with wordsFileCount=1
+
+  printf("%s\n","done with tf" );
 
   double n=bow->filesNum*1.0 ;
   Hashed_Word tempWord ;
@@ -239,7 +250,8 @@ void bow_to_tf_idf(BoW bow){
 
     while(tempWord!=NULL){
       for(i=0 ; i<bow->filesNum ; i++){
-        bow->values[i][tempWord->index]=bow->values[i][tempWord->index] * log(n/tempWord->count) ;
+        if(bow->values[i][tempWord->index])
+          bow->values[i][tempWord->index]=bow->values[i][tempWord->index] * log(n / bow->wordsFileCount[tempWord->index]) ;
       }
 
       tempWord=tempWord->next ;
