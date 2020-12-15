@@ -51,11 +51,11 @@ int main(int argc, char** argv){
   printf("%s\n","hmm2" );
   FILE* JSON_file=fopen("4233.json","r");
   printf("%s\n","hmm3" );
-  insert_id_in_hash(currSite1->Id_Hash_Array,idBucketsNum,"www0.TestSite.com//4233",JSON_file);
-  insert_id_in_hash(currSite1->Id_Hash_Array,idBucketsNum,"www0.TestSite.com//4233",JSON_file); // duplicate
+  insert_id_in_hash(currSite1->Id_Hash_Array,idBucketsNum,"www0.TestSite.com//4233",JSON_file,1);
+  insert_id_in_hash(currSite1->Id_Hash_Array,idBucketsNum,"www0.TestSite.com//4233",JSON_file,2); // duplicate
 
   currSite2=insert_site_in_hash(site_hash_table,"www1.TestSiteG4.com",siteBucketsNum,idBucketsNum);
-  insert_id_in_hash(currSite2->Id_Hash_Array,idBucketsNum,"www1.TestSiteG4.com//4233",JSON_file);
+  insert_id_in_hash(currSite2->Id_Hash_Array,idBucketsNum,"www1.TestSiteG4.com//4233",JSON_file,3);
 
   test_print(site_hash_table,siteBucketsNum,idBucketsNum) ;
 
