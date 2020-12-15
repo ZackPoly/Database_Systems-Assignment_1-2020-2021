@@ -64,14 +64,14 @@ int main(int argc, char** argv){
   Hashed_Id complex2=NULL;
   complex tmp1=NULL;
   Hashed_Id tmp_complex=NULL;
-  complex1=search_complex(site_hash_table,siteBucketsNum,idBucketsNum,"www0.TestSite.com//4233") ;
-  complex2=search_complex(site_hash_table,siteBucketsNum,idBucketsNum,"www1.TestSiteG4.com//4233") ;
+  complex1=find_ID(site_hash_table,siteBucketsNum,idBucketsNum,"www0.TestSite.com//4233") ;
+  complex2=find_ID(site_hash_table,siteBucketsNum,idBucketsNum,"www1.TestSiteG4.com//4233") ;
   complex1->Complex->tail->next=complex2->Complex->head ;
   complex1->Complex->tail=complex2->Complex->tail ;
   tmp1=complex2->Complex->head;
   while(tmp1!=NULL){
     if(strcmp("www1.TestSiteG4.com//4233",tmp1->id)!=0){
-      tmp_complex=search_complex(site_hash_table,siteBucketsNum,idBucketsNum,tmp1->id);
+      tmp_complex=find_ID(site_hash_table,siteBucketsNum,idBucketsNum,tmp1->id);
       tmp_complex->Complex=complex1->Complex;
     }
     tmp1=tmp1->next;
