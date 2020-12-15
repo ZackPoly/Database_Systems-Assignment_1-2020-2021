@@ -1,36 +1,5 @@
-#include "site_hash.h"
+#include "model.h"
 
-void print_complexes(Hash_For_Site SiteTable,int siteBucketsNum,int idBucketsNum){
-  Hashed_Site tempSite ;
-  Hashed_Id tempId ;
-  complex tempComp ;
-  int i,j,k=0 ;
-
-  for(i=0;i<siteBucketsNum;i++){
-    tempSite=SiteTable[i].root ;
-
-    while(tempSite!=NULL){
-      for(j=0;j<idBucketsNum;j++){
-        tempId=tempSite->Id_Hash_Array[j].root ;
-
-        while(tempId!=NULL){
-          tempComp=tempId->Complex->head ;
-          while(tempComp!=NULL){
-            if(k==1) printf("%s: %s,%s\n",tempSite->site,tempId->full_id,tempComp->id );
-            if(!strcmp(tempId->full_id,tempComp->id)) k=1 ;
-
-            tempComp=tempComp->next ;
-          }
-          k=0 ;
-
-          tempId=tempId->next ;
-        }
-      }
-
-      tempSite=tempSite->next ;
-    }
-  }
-}
 
 //./CItest .json
 int main(int argc, char** argv){
