@@ -3,12 +3,14 @@
 
 typedef struct model* Model;
 struct model{
-   float* weights;
-   float b;
-   float h;
+   double* weights;
+   double b;
+   double h;
 };
 
 
-void initialize_model(Model,int,float,float);
+void initialize_model(Model*,int,double,double);
 
-void fit(Model,BoW bow,char*);
+void fit(Model,BoW,char*,Hash_For_Site,int,int);
+
+void predict(Model,BoW,char*,Hash_For_Site,int,int) ;

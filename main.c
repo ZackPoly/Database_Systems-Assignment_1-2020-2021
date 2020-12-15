@@ -74,15 +74,15 @@ int main(int argc, char** argv){
     return 1;
   }
 
-  Hash_For_Site site_hash_table=NULL;
+  Hash_For_Site SiteTable=NULL;
 
-  site_hash_table=malloc(siteBucketsNum*sizeof(struct Sites_Bucket));
+  SiteTable=malloc(siteBucketsNum*sizeof(struct Sites_Bucket));
 
   int i=0;
   int filesNum=0;
 
   for(i=0;i<siteBucketsNum;i++){
-    site_hash_table[i].root=NULL;
+    SiteTable[i].root=NULL;
   }
 
 
@@ -99,7 +99,7 @@ int main(int argc, char** argv){
     site=malloc(strlen(in_file->d_name)+1);
     strcpy(site,in_file->d_name);
 
-    currSite=insert_site_in_hash(site_hash_table,site,siteBucketsNum,idBucketsNum);
+    currSite=insert_site_in_hash(SiteTable,site,siteBucketsNum,idBucketsNum);
 
     printf("Subdirectory: %s\n",in_file->d_name);
 
@@ -201,7 +201,7 @@ int main(int argc, char** argv){
 
   BoW bow=NULL ;
 
-  initialize_bow(site_hash_table,&bow,filesNum,siteBucketsNum,idBucketsNum) ;
+  initialize_bow(SiteTable,&bow,filesNum,siteBucketsNum,idBucketsNum) ;
 
   for(vec_test=0 ; vec_test<100 ; vec_test++){
       printf("%lf ",bow->values[0][vec_test] );
@@ -254,8 +254,8 @@ int main(int argc, char** argv){
   //   if(strcmp(match,"1")==0 && strcmp(full_id_1,full_id_2)!=0){                //if the products are same
   //
   //
-  //     id_entry1=search_complex(site_hash_table,siteBucketsNum,idBucketsNum,full_id_1);
-  //     id_entry2=search_complex(site_hash_table,siteBucketsNum,idBucketsNum,full_id_2);
+  //     id_entry1=find_ID(SiteTable,siteBucketsNum,idBucketsNum,full_id_1);
+  //     id_entry2=find_ID(SiteTable,siteBucketsNum,idBucketsNum,full_id_2);
   //
   //     if((id_entry1->Complex!=id_entry2->Complex) && !search_negative(id_entry1->Complex,id_entry2->Complex)){
   //
@@ -269,7 +269,7 @@ int main(int argc, char** argv){
   //
   //         if(strcmp(full_id_2,tmp1->id)!=0){
   //
-  //           tmp_complex=search_complex(site_hash_table,siteBucketsNum,idBucketsNum,tmp1->id);
+  //           tmp_complex=find_ID(SiteTable,siteBucketsNum,idBucketsNum,tmp1->id);
   //           tmp_complex->Complex=id_entry1->Complex;
   //         }
   //
@@ -279,7 +279,7 @@ int main(int argc, char** argv){
   //
   //       change_negatives(id_entry1->Complex,id_entry2->Complex) ;
   //
-  //       // search_neg_corr(site_hash_table,siteBucketsNum,idBucketsNum,id_entry2->Complex) ;
+  //       // search_neg_corr(SiteTable,siteBucketsNum,idBucketsNum,id_entry2->Complex) ;
   //
   //       delete_negatives(id_entry2->Complex) ;
   //       free(id_entry2->Complex) ;
@@ -292,8 +292,8 @@ int main(int argc, char** argv){
   //   else if(strcmp(match,"0")==0 && strcmp(full_id_1,full_id_2)!=0){
   //
   //
-  //     id_entry1=search_complex(site_hash_table,siteBucketsNum,idBucketsNum,full_id_1);
-  //     id_entry2=search_complex(site_hash_table,siteBucketsNum,idBucketsNum,full_id_2);
+  //     id_entry1=find_ID(SiteTable,siteBucketsNum,idBucketsNum,full_id_1);
+  //     id_entry2=find_ID(SiteTable,siteBucketsNum,idBucketsNum,full_id_2);
   //
   //     if(id_entry1->Complex!=id_entry2->Complex)
   //       append_negative(id_entry1->Complex,id_entry2->Complex) ;
@@ -311,27 +311,38 @@ int main(int argc, char** argv){
   // FILE* Output;                                                 // create csv for output
   // Output=fopen("Output.csv","w") ;
   // fprintf(Output, "%s,%s\n","left_spec_id","right_spec_id" );
-  // print_complexes(site_hash_table,siteBucketsNum,idBucketsNum,Output) ;
+  // print_complexes(SiteTable,siteBucketsNum,idBucketsNum,Output) ;
   // //print result in a new csv file
   //
   // fclose(Output) ;
 
-  FILE* Train,*Test,*Validation ;
-  Train=fopen("Train.csv","r") ;
-  Test=fopen("Test.csv","r") ;
-  Validation=fopen("Validatio.csv","r") ;
+  // FILE* Train,*Test,*Validation ;
+  // Train=fopen("Train.csv","r") ;
+  // Test=fopen("Test.csv","r") ;
+  // Validation=fopen("Validatio.csv","r") ;
 
   // fprintf(Train, "%s,%s,%s\n","left_spec_id","right_spec_id","match" );
   // fprintf(Test, "%s,%s,%s\n","left_spec_id","right_spec_id","match" );
   // fprintf(Validation, "%s,%s,%s\n","left_spec_id","right_spec_id","match" );
 
-  // train_test_val_split(site_hash_table,siteBucketsNum,idBucketsNum,Train,Test,Validation) ;
+  // train_test_val_split(SiteTable,siteBucketsNum,idBucketsNum,Train,Test,Validation) ;
 
-  fclose(Train) ;
-  fclose(Test) ;
-  fclose(Validation) ;
+  Model Linear_Rigression ;
+  initialize_model(&Linear_Rigression,bow->dict_len,0.5,0.1) ;
 
-  delete(site_hash_table,siteBucketsNum,idBucketsNum) ;         // free all structs
+  printf("%s\n","Training data .." );
+
+  fit(Linear_Rigression,bow,"Train.csv",SiteTable,siteBucketsNum,idBucketsNum) ;
+
+  printf("%s\n","Testing data .." );
+
+  predict(Linear_Rigression,bow,"Test.csv",SiteTable,siteBucketsNum,idBucketsNum) ;
+
+  // fclose(Train) ;
+  // fclose(Test) ;
+  // fclose(Validation) ;
+
+  delete(SiteTable,siteBucketsNum,idBucketsNum) ;         // free all structs
   return 0;
 
 }
