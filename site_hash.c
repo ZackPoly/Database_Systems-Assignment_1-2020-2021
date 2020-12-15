@@ -52,7 +52,7 @@ Hashed_Site insert_site_in_hash(Hash_For_Site SiteTable,char* site,int siteBucke
   return currSite->next ;
 }
 
-Hashed_Id search_complex(Hash_For_Site SiteTable,int siteBucketsNum,int idBucketsNum,char* full_id){
+Hashed_Id find_ID(Hash_For_Site SiteTable,int siteBucketsNum,int idBucketsNum,char* full_id){
   char* str=malloc(strlen(full_id)+1) ;
   strcpy(str,full_id) ;
   const char s[3]="//";
@@ -71,8 +71,6 @@ Hashed_Id search_complex(Hash_For_Site SiteTable,int siteBucketsNum,int idBucket
   // return &(currId->Complex) ;
   return currId ;
 }
-
-// search_neg_corr(Hash_For_Site SiteTable,int siteBucketsNum,int idBucketsNum,comp_head Complex)
 
 
 void delete(Hash_For_Site SiteTable,int siteBucketsNum,int idBucketsNum){
@@ -218,7 +216,7 @@ void train_test_val_split(Hash_For_Site SiteTable,int siteBucketsNum,int idBucke
 
             while(tempComp!=NULL){
 
-              compId=search_complex(SiteTable,siteBucketsNum,idBucketsNum,tempComp->id) ;
+              compId=find_ID(SiteTable,siteBucketsNum,idBucketsNum,tempComp->id) ;
 
               if(compId->tf_idf_index>tempId->tf_idf_index){
 
