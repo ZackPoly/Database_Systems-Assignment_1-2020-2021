@@ -3,7 +3,7 @@
 
 typedef struct model* Model;
 struct model{
-   float* weigths;
+   float* weights;
    float b;
    float h;
 };

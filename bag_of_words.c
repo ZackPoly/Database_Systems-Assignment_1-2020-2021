@@ -223,6 +223,10 @@ void initialize_bow(Hash_For_Site SiteTable,BoW* bow,int filesNum,int siteBucket
   }
 }
 
+void delete_dict_word_by_index(BoW,int){
+  
+}
+
 void bow_to_tf_idf(BoW bow){
   int i,j ;
 

@@ -201,15 +201,16 @@ void append_negative(comp_head Complex1,comp_head Complex2){
 }
 
 int search_negative(comp_head Complex1,comp_head Complex2){
+  int re=0 ;
 
   neg_corr tmp_neg_corr1=Complex1->head_neg;
   while(tmp_neg_corr1!=NULL){
-    if(tmp_neg_corr1->corr==Complex2) return 1 ;
+    if(tmp_neg_corr1->corr==Complex2) re++ ;
 
     tmp_neg_corr1=tmp_neg_corr1->next;
   }
 
-  return 0 ;
+  return re ;
 }
 
 void delete_negatives(comp_head Complex){
@@ -267,21 +268,28 @@ void change_negatives(comp_head Complex1,comp_head Complex2){
   neg_corr tmp_neg_corr1=Complex2->head_neg;
   neg_corr tmp_neg_corr2=NULL;
 
+  int i ;
+
   while(tmp_neg_corr1!=NULL){
-    delete_complex_from_list(tmp_neg_corr1->corr,Complex2) ;
-    if(search_negative(tmp_neg_corr1->corr,Complex2)) printf("%s\n","TIII??" );
-    // append_negative(Complex1,tmp_neg_corr1->corr) ;
+    i=search_negative(tmp_neg_corr1->corr,Complex2);
+    // printf("%d\n",i );
+    for(i;i>0;i--){
+      delete_complex_from_list(tmp_neg_corr1->corr,Complex2) ;
+    }
+    // delete_complex_from_list(tmp_neg_corr1->corr,Complex2) ;
+    //if(search_negative(tmp_neg_corr1->corr,Complex2)) printf("%s\n","something is Wrong" );
+    append_negative(Complex1,tmp_neg_corr1->corr) ;
 
     tmp_neg_corr1=tmp_neg_corr1->next ;
   }
 
-  tmp_neg_corr2=Complex1->head_neg;
-  while(tmp_neg_corr1!=NULL){
-    if(search_negative(tmp_neg_corr1->corr,Complex2)) printf("%s\n","OUOU??" );
-    // append_negative(Complex1,tmp_neg_corr1->corr) ;
-
-    tmp_neg_corr1=tmp_neg_corr1->next ;
-  }
+  // tmp_neg_corr2=Complex1->head_neg;
+  // while(tmp_neg_corr1!=NULL){
+  //   if(search_negative(tmp_neg_corr1->corr,Complex2)) printf("%s\n","MonkaS" );
+  //   // append_negative(Complex1,tmp_neg_corr1->corr) ;
+  //
+  //   tmp_neg_corr1=tmp_neg_corr1->next ;
+  // }
 
 }
 
@@ -314,19 +322,18 @@ void change_negatives(comp_head Complex1,comp_head Complex2){
 //               delete_complex_from_list(tmp_neg_corr1->corr,Complex2) ;          // delete
 //
 //               if(Complex2->head_neg==tmp_neg_corr1){
-//                   Complex2->head_neg=tmp_neg_corr1->next;
-//                   tmp_neg_corr1->next=NULL;
-//                   tmp_neg_corr1->corr=NULL;
 //
-//                   free(tmp_neg_corr1);  printf("%s\n","deleted" );
+//                   tmp_neg_corr1=tmp_neg_corr1->next;
+//
+//                   free(Complex2->head_neg);  printf("%s\n","deleted" );
+//
+//                   Complex2->head_neg=tmp_neg_corr1;
 //
 //                   tmp_neg_corr1=Complex2->head_neg;
 //                   tmp_neg_corr3=Complex2->head_neg;
 //
 //               }else{
 //                 tmp_neg_corr3->next=tmp_neg_corr1->next;
-//                 tmp_neg_corr1->next=NULL;
-//                 tmp_neg_corr1->corr=NULL;
 //
 //                 free(tmp_neg_corr1);  printf("%s\n","deleted" );
 //

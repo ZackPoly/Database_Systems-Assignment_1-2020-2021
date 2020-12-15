@@ -46,4 +46,6 @@ int insert_word_in_hash(BoW,char*) ;
 void initialize_bow(Hash_For_Site,BoW*,int,int,int) ;
 
 
+void delete_dict_word_by_index(BoW,int) ;
+
 void bow_to_tf_idf(BoW bow) ;

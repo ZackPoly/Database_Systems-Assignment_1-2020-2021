@@ -211,34 +211,34 @@ void train_test_val_split(Hash_For_Site SiteTable,int siteBucketsNum,int idBucke
           }
           k=0 ;
 
-          // tempNeg=tempId->Complex->head_neg ;
-          // while (tempNeg!=NULL) {
-          //
-          //   tempComp=tempNeg->corr->head ;
-          //
-          //   while(tempComp!=NULL){
-          //
-          //     compId=search_id_in_hash(tempSite->Id_Hash_Array,tempComp->id,idBucketsNum) ;
-          //
-          //     if(compId->tf_idf_index>tempId->tf_idf_index){
-          //
-          //       fileSelect=rand()%101 ;
-          //       if(fileSelect<60){
-          //         fprintf(Train, "%s,%s,%s\n",tempId->full_id,tempComp->id,"0" );
-          //       }
-          //       else if(fileSelect>=60 && fileSelect<80){
-          //         fprintf(Test, "%s,%s,%s\n",tempId->full_id,tempComp->id,"0" );
-          //       }
-          //       else{
-          //         fprintf(Validation, "%s,%s,%s\n",tempId->full_id,tempComp->id,"0" );
-          //       }
-          //     }
-          //
-          //     tempComp=tempComp->next ;
-          //   }
-          //
-          //   tempNeg=tempNeg->next ;
-          // }
+          tempNeg=tempId->Complex->head_neg ;
+          while (tempNeg!=NULL) {
+
+            tempComp=tempNeg->corr->head ;
+
+            while(tempComp!=NULL){
+
+              compId=search_complex(SiteTable,siteBucketsNum,idBucketsNum,tempComp->id) ;
+
+              if(compId->tf_idf_index>tempId->tf_idf_index){
+
+                fileSelect=rand()%101 ;
+                if(fileSelect<60){
+                  fprintf(Train, "%s,%s,%s\n",tempId->full_id,tempComp->id,"0" );
+                }
+                else if(fileSelect>=60 && fileSelect<80){
+                  fprintf(Test, "%s,%s,%s\n",tempId->full_id,tempComp->id,"0" );
+                }
+                else{
+                  fprintf(Validation, "%s,%s,%s\n",tempId->full_id,tempComp->id,"0" );
+                }
+              }
+
+              tempComp=tempComp->next ;
+            }
+
+            tempNeg=tempNeg->next ;
+          }
 
           tempId=tempId->next ;
         }
