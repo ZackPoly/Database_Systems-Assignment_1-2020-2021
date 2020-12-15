@@ -116,7 +116,7 @@ int insert_word_in_hash(BoW bow,char* word){
 
     bow->bow_len+=BOW_STEP ;
   }
-  printf("%s %d\n",word,index );
+  // printf("%s %d\n",word,index );
 
   return index ;
 }
@@ -143,7 +143,7 @@ void initialize_bow(Hash_For_Site SiteTable,BoW* bow,int filesNum,int siteBucket
     (*bow)->dict[i].root=NULL;
   }
 
-  (*bow)->values=malloc(filesNum*sizeof(float*)) ;
+  (*bow)->values=malloc(filesNum*sizeof(double*)) ;
   for(i=0 ; i<(*bow)->filesNum ; i++){
     (*bow)->values[i]=malloc((*bow)->bow_len*sizeof(double)) ;
 
@@ -191,7 +191,7 @@ void initialize_bow(Hash_For_Site SiteTable,BoW* bow,int filesNum,int siteBucket
               while(token){
                 trim(token) ;
 
-                if(!is_stopword(token)){
+                if(!is_stopword(token) && strlen(token)<9){
                   (*bow)->filesLen[vec_index]++ ;
 
                   word_index=insert_word_in_hash(*bow,token) ;
@@ -223,8 +223,63 @@ void initialize_bow(Hash_For_Site SiteTable,BoW* bow,int filesNum,int siteBucket
   }
 }
 
-void delete_dict_word_by_index(BoW,int){
-  
+void delete_unimportant_words(BoW bow){                                         //delete words that appear only once
+
+  // Hash_For_Word  tmp_dict_bucket=NULL;
+  Hashed_Word    tmp_word1=NULL;
+  Hashed_Word    tmp_word2=NULL;
+
+  int i=0;
+
+  for(i=0;i<BOW_B_NUM;i++){
+
+    // *bow->dict[i]=bow->dict[i];
+
+    tmp_word1=bow->dict[i].root;
+    tmp_word2=tmp_word1;
+
+    while(tmp_word1!=NULL){
+
+      if(bow->wordsFileCount[tmp_word1->index]==1){
+        printf("%s\n",tmp_word1->word );
+
+        if(tmp_word1==bow->dict[i].root){
+          bow->dict[i].root=bow->dict[i].root->next;
+
+          free(tmp_word1->word);
+          free(tmp_word1);
+
+          tmp_word1=bow->dict[i].root;
+          tmp_word2=tmp_word1;
+
+          bow->dict_len--;
+
+          continue;
+        }
+
+        tmp_word2->next=tmp_word1->next;
+
+        free(tmp_word1->word);
+        free(tmp_word1);
+
+        tmp_word1=tmp_word2->next;
+
+        bow->dict_len--;
+
+        continue;
+
+      }
+
+      if(tmp_word1!=tmp_word2){
+        tmp_word2=tmp_word2->next;
+      }
+      tmp_word1=tmp_word1->next;
+    }
+
+  }
+
+  return;
+
 }
 
 void bow_to_tf_idf(BoW bow){
@@ -243,6 +298,7 @@ void bow_to_tf_idf(BoW bow){
   }
 
   // drop words with wordsFileCount=1
+  delete_unimportant_words(bow) ;
 
   printf("%s\n","done with tf" );
 

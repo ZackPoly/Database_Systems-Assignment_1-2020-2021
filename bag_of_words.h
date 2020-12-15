@@ -2,7 +2,7 @@
 #include <math.h>
 
 #define BOW_B_NUM 1001
-#define BOW_STEP 17000
+#define BOW_STEP 12000
 
 
 typedef struct Sites_Bucket* Hash_For_Site;
@@ -46,6 +46,6 @@ int insert_word_in_hash(BoW,char*) ;
 void initialize_bow(Hash_For_Site,BoW*,int,int,int) ;
 
 
-void delete_dict_word_by_index(BoW,int) ;
+void delete_unimportant_words(BoW);
 
 void bow_to_tf_idf(BoW bow) ;
