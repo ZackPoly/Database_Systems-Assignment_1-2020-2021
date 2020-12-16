@@ -45,7 +45,8 @@ int insert_word_in_hash(BoW,char*) ;
 
 void initialize_bow(Hash_For_Site,BoW*,int,int,int) ;
 
-
 void delete_unimportant_words(BoW);
+
+void delete_bow(BoW*);
 
 void bow_to_tf_idf(BoW bow) ;

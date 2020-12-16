@@ -100,7 +100,7 @@ void fit(Model model,BoW bow,char* training_file,Hash_For_Site SiteTable,int sit
       tmp_word=bow->dict[i].root;
 
       while(tmp_word!=NULL){
-        vector_of_pair[l][tmp_word->index]=fabs(bow->values[left_id->tf_idf_index][tmp_word->index] - bow->values[right_id->tf_idf_index][tmp_word->index]) ;
+        vector_of_pair[l][j]=fabs(bow->values[left_id->tf_idf_index][tmp_word->index] - bow->values[right_id->tf_idf_index][tmp_word->index]) ;
 
         j++ ;
         tmp_word=tmp_word->next;
@@ -146,6 +146,15 @@ void fit(Model model,BoW bow,char* training_file,Hash_For_Site SiteTable,int sit
     }
     k++;
   }
+
+  free(p_values) ;
+  free(derivatives) ;
+  free(real_match) ;
+  for(i=0;i<num_of_pairs;i++){
+    free(vector_of_pair[i]) ;
+  }
+  free(vector_of_pair) ;
+  free(line) ;
 
 }
 
@@ -224,6 +233,21 @@ void predict(Model model,BoW bow,char* testing_file,Hash_For_Site SiteTable,int 
 
   }
   printf("%d Correct predictions out of %d pairs\n",correct,num_of_pairs);
+  printf("Model accuracy = %d%% \n",(correct*100)/num_of_pairs );
+
+  free(x) ;
+  free(line) ;
+  fclose(test_file_ptr) ;
+
+}
+
+
+void delete_model(Model* model){
+
+  free((*model)->weights);
+  (*model)->weights=NULL;
+
+  free((*model)) ;
 
 }
 

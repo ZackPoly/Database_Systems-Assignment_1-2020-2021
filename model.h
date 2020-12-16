@@ -14,3 +14,5 @@ void initialize_model(Model*,int,double,double);
 void fit(Model,BoW,char*,Hash_For_Site,int,int);
 
 void predict(Model,BoW,char*,Hash_For_Site,int,int) ;
+
+void delete_model(Model*);

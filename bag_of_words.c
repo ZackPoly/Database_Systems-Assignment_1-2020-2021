@@ -282,6 +282,52 @@ void delete_unimportant_words(BoW bow){                                         
 
 }
 
+void delete_bow(BoW* bow){
+
+  free((*bow)->filesLen);
+  (*bow)->filesLen=NULL;
+
+  free((*bow)->wordsFileCount);
+  (*bow)->wordsFileCount=NULL;
+
+  int i=0,j=0;
+
+  for(i=0 ; i<(*bow)->filesNum ; i++){
+
+    free((*bow)->values[i]) ;
+  }
+
+
+  free((*bow)->values);
+  (*bow)->values=NULL;
+
+  Hashed_Word tmp_word=NULL;
+  Hashed_Word tmp_word2=NULL;
+
+  for(i=0;i<BOW_B_NUM;i++){
+
+    tmp_word=(*bow)->dict[i].root;
+    tmp_word2=tmp_word;
+
+    while(tmp_word!=NULL){
+
+      tmp_word2=tmp_word->next;
+
+      free(tmp_word->word);
+      free(tmp_word);
+
+      tmp_word=tmp_word2;
+
+    }
+
+  }
+
+
+  free((*bow)->dict);
+  free((*bow)) ;
+
+}
+
 void bow_to_tf_idf(BoW bow){
   int i,j ;
 
@@ -305,13 +351,34 @@ void bow_to_tf_idf(BoW bow){
   double n=bow->filesNum*1.0 ;
   Hashed_Word tempWord ;
 
+  double max_tf_idf=0.0 ;
+
   for(j=0 ; j<BOW_B_NUM ; j++){
     tempWord=(bow->dict[j]).root ;
 
     while(tempWord!=NULL){
       for(i=0 ; i<bow->filesNum ; i++){
-        if(bow->values[i][tempWord->index])
+        if(bow->values[i][tempWord->index]){
           bow->values[i][tempWord->index]=bow->values[i][tempWord->index] * log(n / bow->wordsFileCount[tempWord->index]) ;
+
+          if(bow->values[i][tempWord->index]>max_tf_idf)  max_tf_idf=bow->values[i][tempWord->index] ;
+        }
+
+      }
+
+      tempWord=tempWord->next ;
+    }
+  }
+
+  for(j=0 ; j<BOW_B_NUM ; j++){
+    tempWord=(bow->dict[j]).root ;
+
+    while(tempWord!=NULL){
+      for(i=0 ; i<bow->filesNum ; i++){
+        if(bow->values[i][tempWord->index]){
+          bow->values[i][tempWord->index]=bow->values[i][tempWord->index] / max_tf_idf ;
+        }
+
       }
 
       tempWord=tempWord->next ;
