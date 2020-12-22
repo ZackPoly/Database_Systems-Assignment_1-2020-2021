@@ -1,5 +1,5 @@
 #include "bag_of_words.h"
-#include "hash.h"
+#include "../JSON_hashing/hash.h"
 
 const char * stopwords[] = {
     "a","able","about","across","after","all","almost","also","am","among","an",
@@ -208,6 +208,8 @@ void initialize_bow(Hash_For_Site SiteTable,BoW* bow,int filesNum,int siteBucket
             tempSpecs=tempSpecs->next ;
           }
 
+          delete_specs_list(tempId) ;      //delete specs list not needed anymore
+
           vec_index++ ;
           tempId=tempId->next ;
         }
@@ -241,7 +243,6 @@ void delete_unimportant_words(BoW bow){                                         
     while(tmp_word1!=NULL){
 
       if(bow->wordsFileCount[tmp_word1->index]==1){
-        printf("%s\n",tmp_word1->word );
 
         if(tmp_word1==bow->dict[i].root){
           bow->dict[i].root=bow->dict[i].root->next;
@@ -346,7 +347,7 @@ void bow_to_tf_idf(BoW bow){
   // drop words with wordsFileCount=1
   delete_unimportant_words(bow) ;
 
-  printf("%s\n","done with tf" );
+  printf("\n%s\n","done with tf" );
 
   double n=bow->filesNum*1.0 ;
   Hashed_Word tempWord ;
@@ -370,18 +371,18 @@ void bow_to_tf_idf(BoW bow){
     }
   }
 
-  for(j=0 ; j<BOW_B_NUM ; j++){
-    tempWord=(bow->dict[j]).root ;
-
-    while(tempWord!=NULL){
-      for(i=0 ; i<bow->filesNum ; i++){
-        if(bow->values[i][tempWord->index]){
-          bow->values[i][tempWord->index]=bow->values[i][tempWord->index] / max_tf_idf ;
-        }
-
-      }
-
-      tempWord=tempWord->next ;
-    }
-  }
+  // for(j=0 ; j<BOW_B_NUM ; j++){
+  //   tempWord=(bow->dict[j]).root ;
+  //
+  //   while(tempWord!=NULL){
+  //     for(i=0 ; i<bow->filesNum ; i++){
+  //       if(bow->values[i][tempWord->index]){
+  //         bow->values[i][tempWord->index]=bow->values[i][tempWord->index] / max_tf_idf ;
+  //       }
+  //
+  //     }
+  //
+  //     tempWord=tempWord->next ;
+  //   }
+  // }
 }

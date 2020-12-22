@@ -105,7 +105,7 @@ void delete(Hash_For_Site SiteTable,int siteBucketsNum,int idBucketsNum){
 
           tmp_id2=tmp_id->next;
 
-          delete_specs_list(tmp_id) ;      //delete specs list
+          // delete_specs_list(tmp_id) ;      //delete specs list
 
           delete_complex_node(tmp_id);        //delete complex node from the complex
 

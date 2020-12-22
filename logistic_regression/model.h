@@ -1,4 +1,4 @@
-#include "site_hash.h"
+#include "../JSON_hashing/site_hash.h"
 #include "bag_of_words.h"
 
 typedef struct model* Model;

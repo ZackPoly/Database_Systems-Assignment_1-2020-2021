@@ -46,3 +46,5 @@ struct Sites_Bucket{
 int hash_func(char*,int) ;
 
 void trim(char*) ;
+
+void delete_specs_list(Hashed_Id) ;

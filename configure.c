@@ -1,4 +1,4 @@
-#include "model.h"
+#include "./logistic_regression/model.h"
 
 void test_print(Hash_For_Site SiteTable,int siteBucketsNum,int idBucketsNum){
   Hashed_Site tempSite ;

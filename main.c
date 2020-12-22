@@ -1,5 +1,4 @@
-#include "model.h"
-// #include "bag_of_words.h"
+#include "./logistic_regression/model.h"
 
 
 //./main Datasets 2013_camera_specs < >.csv
@@ -197,6 +196,8 @@ int main(int argc, char** argv){
 
 
   /*-------------- INITIALIZE BAG OF WORDS + CONVERT TO TF-IDF --------------*/
+  printf("\n%s\n","Creating and initializing Bag of Words" );
+
   int bow_test,vec_test ;
 
   BoW bow=NULL ;
@@ -337,7 +338,7 @@ int main(int argc, char** argv){
   Model Linear_Rigression ;
   initialize_model(&Linear_Rigression,bow->dict_len,0.5,0.1) ;
 
-  printf("%s\n","Training data .." );
+  printf("\n%s\n","Training data .." );
 
   fit(Linear_Rigression,bow,"Train.csv",SiteTable,siteBucketsNum,idBucketsNum) ;
 

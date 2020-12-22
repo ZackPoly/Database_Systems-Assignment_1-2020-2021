@@ -15,7 +15,6 @@ void change_negatives(comp_head,comp_head);
 
 void delete_complex_node(Hashed_Id) ;
 
-void delete_specs_list(Hashed_Id) ;
 
 specs new_attribute(Hashed_Id,char*) ;
 
