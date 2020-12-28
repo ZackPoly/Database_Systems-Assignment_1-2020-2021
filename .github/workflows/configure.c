@@ -63,17 +63,17 @@ int main(int argc, char** argv){
   int idBucketsNum = 1 ;
   int i=0;
 
-  Hash_For_Site site_hash_table=NULL;
-  site_hash_table=malloc(siteBucketsNum*sizeof(struct Sites_Bucket));
+  Hash_For_Site SiteTable=NULL;
+  SiteTable=malloc(siteBucketsNum*sizeof(struct Sites_Bucket));
   for(i=0;i<siteBucketsNum;i++){
-    site_hash_table[i].root=NULL;
+    SiteTable[i].root=NULL;
   }
 
   /////////////////////////// EISAGWGH JSON FILES ///////////////////////////
   Hashed_Site currSite1=NULL;
   Hashed_Site currSite2=NULL;
 
-  currSite1=insert_site_in_hash(site_hash_table,"www0.TestSite.com",siteBucketsNum,idBucketsNum);
+  currSite1=insert_site_in_hash(SiteTable,"www0.TestSite.com",siteBucketsNum,idBucketsNum);
 
   FILE* JSON_file=fopen("4233.json","r");
 
@@ -83,19 +83,19 @@ int main(int argc, char** argv){
   fclose(JSON_file);
   JSON_file=fopen("4233.json","r");
 
-  currSite2=insert_site_in_hash(site_hash_table,"www1.TestSiteG4.com",siteBucketsNum,idBucketsNum);
+  currSite2=insert_site_in_hash(SiteTable,"www1.TestSiteG4.com",siteBucketsNum,idBucketsNum);
   insert_id_in_hash(currSite2->Id_Hash_Array,idBucketsNum,"www1.TestSiteG4.com//4233",JSON_file,3);
 
   fclose(JSON_file);
   JSON_file=fopen("2.json","r");
 
-  currSite2=insert_site_in_hash(site_hash_table,"www1.TestSiteG4.com",siteBucketsNum,idBucketsNum);
+  currSite2=insert_site_in_hash(SiteTable,"www1.TestSiteG4.com",siteBucketsNum,idBucketsNum);
   insert_id_in_hash(currSite2->Id_Hash_Array,idBucketsNum,"www1.TestSiteG4.com//2",JSON_file,4);
 
   fclose(JSON_file);
   JSON_file=fopen("34.json","r");
 
-  currSite2=insert_site_in_hash(site_hash_table,"www1.TestSiteG4.com",siteBucketsNum,idBucketsNum);
+  currSite2=insert_site_in_hash(SiteTable,"www1.TestSiteG4.com",siteBucketsNum,idBucketsNum);
   insert_id_in_hash(currSite2->Id_Hash_Array,idBucketsNum,"www1.TestSiteG4.com//34",JSON_file,5);
   /////////////////////////// EISAGWGH JSON FILES ///////////////////////////
 
@@ -104,14 +104,14 @@ int main(int argc, char** argv){
   Hashed_Id id_entry2=NULL;
   complex tmp1=NULL;
   Hashed_Id tmp_complex=NULL;
-  id_entry1=find_ID(site_hash_table,siteBucketsNum,idBucketsNum,"www0.TestSite.com//4233") ;
-  id_entry2=find_ID(site_hash_table,siteBucketsNum,idBucketsNum,"www1.TestSiteG4.com//4233") ;
+  id_entry1=find_ID(SiteTable,siteBucketsNum,idBucketsNum,"www0.TestSite.com//4233") ;
+  id_entry2=find_ID(SiteTable,siteBucketsNum,idBucketsNum,"www1.TestSiteG4.com//4233") ;
   id_entry1->Complex->tail->next=id_entry2->Complex->head ;
   id_entry1->Complex->tail=id_entry2->Complex->tail ;
   tmp1=id_entry2->Complex->head;
   while(tmp1!=NULL){
     if(strcmp("www1.TestSiteG4.com//4233",tmp1->id)!=0){
-      tmp_complex=find_ID(site_hash_table,siteBucketsNum,idBucketsNum,tmp1->id);
+      tmp_complex=find_ID(SiteTable,siteBucketsNum,idBucketsNum,tmp1->id);
       tmp_complex->Complex=id_entry1->Complex;
     }
     tmp1=tmp1->next;
@@ -134,6 +134,6 @@ int main(int argc, char** argv){
     append_negative(id_entry1->Complex,id_entry2->Complex) ;
   /////////////////////////// ALLAGH KLIKAS ///////////////////////////
 
-  test_print(site_hash_table,siteBucketsNum,idBucketsNum) ;
+  test_print(SiteTable,siteBucketsNum,idBucketsNum) ;
   return 0 ;
 }
