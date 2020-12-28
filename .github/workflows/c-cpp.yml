@@ -14,6 +14,7 @@ jobs:
     steps:
     - uses: actions/checkout@v2
     - name: make
+      run: make
       run: gcc site_hash.o id_hash.o bag_of_words.o model.o -o configure configure.c -ggdb3 -lm
     - name: configure
       run: ./configure
