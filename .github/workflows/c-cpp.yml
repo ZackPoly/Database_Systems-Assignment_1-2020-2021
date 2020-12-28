@@ -14,6 +14,6 @@ jobs:
     steps:
     - uses: actions/checkout@v2
     - name: make
-      run: gcc -o configure configure.c site_hash.c id_hash.c
+      run: gcc -o configure .github/workflows/configure.c ./JSON_hashing/site_hash.c ./JSON_hashing/id_hash.c
     - name: configure
-      run: ./configure  
+      run: ./configure
