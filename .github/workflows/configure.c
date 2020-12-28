@@ -81,6 +81,7 @@ int main(int argc, char** argv){
 
   fclose(JSON_file);
   JSON_file=fopen("4233.json","r");
+  printf("%s\n","hmm" );
 
   currSite2=insert_site_in_hash(SiteTable,"www1.TestSiteG4.com",siteBucketsNum,idBucketsNum);
   insert_id_in_hash(currSite2->Id_Hash_Array,idBucketsNum,"www1.TestSiteG4.com//4233",JSON_file,2);
@@ -97,6 +98,7 @@ int main(int argc, char** argv){
   currSite2=insert_site_in_hash(SiteTable,"www1.TestSiteG4.com",siteBucketsNum,idBucketsNum);
   insert_id_in_hash(currSite2->Id_Hash_Array,idBucketsNum,"www1.TestSiteG4.com//34",JSON_file,4);
   /////////////////////////// EISAGWGH JSON FILES ///////////////////////////
+  printf("%s\n","hmm" );
 
   /////////////////////////// ALLAGH KLIKAS ///////////////////////////
   Hashed_Id id_entry1=NULL;
@@ -106,7 +108,7 @@ int main(int argc, char** argv){
 
   id_entry1=find_ID(SiteTable,siteBucketsNum,idBucketsNum,"www0.TestSite.com//4233") ;
   id_entry2=find_ID(SiteTable,siteBucketsNum,idBucketsNum,"www1.TestSiteG4.com//4233") ;
-  
+
   id_entry1->Complex->tail->next=id_entry2->Complex->head ;
   id_entry1->Complex->tail=id_entry2->Complex->tail ;
   tmp1=id_entry2->Complex->head;
@@ -120,6 +122,8 @@ int main(int argc, char** argv){
   free(id_entry2->Complex) ;
   id_entry2->Complex=id_entry1->Complex;
 
+  printf("%s\n","hmm" );
+
 
   id_entry1=find_ID(SiteTable,siteBucketsNum,idBucketsNum,"www0.TestSite.com//4233");
   id_entry2=find_ID(SiteTable,siteBucketsNum,idBucketsNum,"www1.TestSiteG4.com//2");
@@ -127,6 +131,7 @@ int main(int argc, char** argv){
   if(id_entry1->Complex!=id_entry2->Complex)
     append_negative(id_entry1->Complex,id_entry2->Complex) ;
 
+  printf("%s\n","hmm" );
 
   id_entry1=find_ID(SiteTable,siteBucketsNum,idBucketsNum,"www1.TestSiteG4.com//4233");
   id_entry2=find_ID(SiteTable,siteBucketsNum,idBucketsNum,"www1.TestSiteG4.com//34");
