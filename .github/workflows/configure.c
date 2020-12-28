@@ -59,6 +59,8 @@ void test_print(Hash_For_Site SiteTable,int siteBucketsNum,int idBucketsNum){
 
 // ./configure
 int main(int argc, char** argv){
+  printf("%s\n","TEST MAIN" );
+
   int siteBucketsNum = 5 ;
   int idBucketsNum = 1 ;
   int i=0;
