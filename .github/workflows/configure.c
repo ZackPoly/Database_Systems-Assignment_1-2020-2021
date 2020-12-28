@@ -78,25 +78,24 @@ int main(int argc, char** argv){
   FILE* JSON_file=fopen("4233.json","r");
 
   insert_id_in_hash(currSite1->Id_Hash_Array,idBucketsNum,"www0.TestSite.com//4233",JSON_file,1);
-  insert_id_in_hash(currSite1->Id_Hash_Array,idBucketsNum,"www0.TestSite.com//4233",JSON_file,2); // duplicate
 
   fclose(JSON_file);
   JSON_file=fopen("4233.json","r");
 
   currSite2=insert_site_in_hash(SiteTable,"www1.TestSiteG4.com",siteBucketsNum,idBucketsNum);
-  insert_id_in_hash(currSite2->Id_Hash_Array,idBucketsNum,"www1.TestSiteG4.com//4233",JSON_file,3);
+  insert_id_in_hash(currSite2->Id_Hash_Array,idBucketsNum,"www1.TestSiteG4.com//4233",JSON_file,2);
 
   fclose(JSON_file);
   JSON_file=fopen("2.json","r");
 
   currSite2=insert_site_in_hash(SiteTable,"www1.TestSiteG4.com",siteBucketsNum,idBucketsNum);
-  insert_id_in_hash(currSite2->Id_Hash_Array,idBucketsNum,"www1.TestSiteG4.com//2",JSON_file,4);
+  insert_id_in_hash(currSite2->Id_Hash_Array,idBucketsNum,"www1.TestSiteG4.com//2",JSON_file,3);
 
   fclose(JSON_file);
   JSON_file=fopen("34.json","r");
 
   currSite2=insert_site_in_hash(SiteTable,"www1.TestSiteG4.com",siteBucketsNum,idBucketsNum);
-  insert_id_in_hash(currSite2->Id_Hash_Array,idBucketsNum,"www1.TestSiteG4.com//34",JSON_file,5);
+  insert_id_in_hash(currSite2->Id_Hash_Array,idBucketsNum,"www1.TestSiteG4.com//34",JSON_file,4);
   /////////////////////////// EISAGWGH JSON FILES ///////////////////////////
 
   /////////////////////////// ALLAGH KLIKAS ///////////////////////////
@@ -104,8 +103,10 @@ int main(int argc, char** argv){
   Hashed_Id id_entry2=NULL;
   complex tmp1=NULL;
   Hashed_Id tmp_complex=NULL;
+
   id_entry1=find_ID(SiteTable,siteBucketsNum,idBucketsNum,"www0.TestSite.com//4233") ;
   id_entry2=find_ID(SiteTable,siteBucketsNum,idBucketsNum,"www1.TestSiteG4.com//4233") ;
+  
   id_entry1->Complex->tail->next=id_entry2->Complex->head ;
   id_entry1->Complex->tail=id_entry2->Complex->tail ;
   tmp1=id_entry2->Complex->head;

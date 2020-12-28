@@ -16,4 +16,4 @@ jobs:
     - name: make
       run: gcc -o configure .github/workflows/configure.c ./JSON_hashing/site_hash.c ./JSON_hashing/id_hash.c
     - name: configure
-      run: ./configure
+      run: valgrind ./configure
