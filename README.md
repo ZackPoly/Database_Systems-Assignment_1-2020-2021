@@ -53,7 +53,7 @@ compile:
 	make
 
 run:
-	./main Datasets 2013_camera_specs sigmod_large_labelled_dataset.csv
+	./main Datasets 2013_camera_specs sigmod_medium_labelled_dataset.csv
 
 
 Δομές:
@@ -89,7 +89,7 @@ run:
  με την δεύτερη κλίκα και την κάνουμε append στην πρώτη κλίκα.
 
 -Δημιουργία αρχείων (train,validation,test):
- σκανάρουμε τα hash tables και για full_id βρίσκουμε τη θέση του στη κλίκα και εκτυπώνουμε στο 
+ σκανάρουμε τα hash tables και για κάθε full_id, βρίσκουμε τη θέση του στη κλίκα και εκτυπώνουμε στο 
  κατάλληλο αρχείο (ανάλογα με την πιθανότητα) το ίδιο με κάθε full_id που ακολουθεί.Το ίδιο κάνουμε
  και για τα αρνητικά ζευγάρια.
 
