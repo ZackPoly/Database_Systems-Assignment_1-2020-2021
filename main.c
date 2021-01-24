@@ -1,4 +1,4 @@
-#include "./logistic_regression/model.h"
+#include "./multithreading/job_scheduler.h"
 
 
 //./main Datasets 2013_camera_specs < >.csv
@@ -196,15 +196,13 @@ int main(int argc, char** argv){
 
 
   /*-------------- INITIALIZE BAG OF WORDS + CONVERT TO TF-IDF --------------*/
-  printf("\n%s\n","Creating and initializing Bag of Words" );
-
   int bow_test,vec_test ;
 
   BoW bow=NULL ;
 
   initialize_bow(SiteTable,&bow,filesNum,siteBucketsNum,idBucketsNum) ;
 
-  for(vec_test=0 ; vec_test<100 ; vec_test++){
+  for(vec_test=0 ; vec_test<20 ; vec_test++){
       printf("%lf ",bow->values[0][vec_test] );
   }
 
@@ -212,100 +210,102 @@ int main(int argc, char** argv){
 
   bow_to_tf_idf(bow) ;
 
-  for(vec_test=0 ; vec_test<100 ; vec_test++){
+  for(vec_test=0 ; vec_test<20 ; vec_test++){
       printf("%lf ",bow->values[0][vec_test] );
   }
   /*-------------- INITIALIZE BAG OF WORDS + CONVERT TO TF-IDF --------------*/
 
-
-  /*----------------------- CREATE COMPLEXES AND SETS -----------------------*/
-  DW=fopen(argv[3],"r");
-
-  char* line=NULL;
-  char* full_id_1=NULL;
-  char* full_id_2=NULL;
-  char* match=NULL;
-  char* cid=NULL;
-
-  Hashed_Id id_entry1=NULL;
-  Hashed_Id id_entry2=NULL;
-  complex tmp1=NULL;
-  Hashed_Id tmp_complex=NULL;
-
-  size_t line_buf_size=0;
-  int line_size=0;
-  int v=0;
-
-  line_size=getline(&line,&line_buf_size,DW);                   // first line not a pair
-
-  while(line_size>0){                                           // loop for each line
-
-    if(v==0){                                                   // skip first line
-      line_size=getline(&line,&line_buf_size,DW);               // get next line
-      v=1;
-      continue;
-    }
+  JobScheduler* sch = initialize_scheduler(5);
 
 
-    full_id_1=strtok(line,",");
-    full_id_2=strtok(NULL,",");
-    match=strtok(NULL,",");
-    match=strtok(match,"\n");
+  /*--------------------------- CREATE COMPLEXES AND SETS ---------------------------*/
+  // DW=fopen(argv[3],"r");
+  //
+  // char* line=NULL;
+  // char* full_id_1=NULL;
+  // char* full_id_2=NULL;
+  // char* match=NULL;
+  // char* cid=NULL;
+  //
+  // Hashed_Id id_entry1=NULL;
+  // Hashed_Id id_entry2=NULL;
+  // complex tmp1=NULL;
+  // Hashed_Id tmp_complex=NULL;
+  //
+  // size_t line_buf_size=0;
+  // int line_size=0;
+  // int v=0;
 
-    if(strcmp(match,"1")==0 && strcmp(full_id_1,full_id_2)!=0){                //if the products are same
-
-
-      id_entry1=find_ID(SiteTable,siteBucketsNum,idBucketsNum,full_id_1);
-      id_entry2=find_ID(SiteTable,siteBucketsNum,idBucketsNum,full_id_2);
-
-      if((id_entry1->Complex!=id_entry2->Complex) && !search_negative(id_entry1->Complex,id_entry2->Complex)){
-
-        id_entry1->Complex->tail->next=id_entry2->Complex->head ;   // update complex of full_id1
-        id_entry1->Complex->tail=id_entry2->Complex->tail ;
-
-        tmp1=id_entry2->Complex->head;
-
-        while(tmp1!=NULL){                                        // make complex of all full_id in complex 2
-                                                                  // be the same as complex 1
-
-          if(strcmp(full_id_2,tmp1->id)!=0){
-
-            tmp_complex=find_ID(SiteTable,siteBucketsNum,idBucketsNum,tmp1->id);
-            tmp_complex->Complex=id_entry1->Complex;
-          }
-
-          tmp1=tmp1->next;
-
-        }
-
-        change_negatives(id_entry1->Complex,id_entry2->Complex) ;
-
-        // search_neg_corr(SiteTable,siteBucketsNum,idBucketsNum,id_entry2->Complex) ;
-
-        delete_negatives(id_entry2->Complex) ;
-        free(id_entry2->Complex) ;
-        id_entry2->Complex=NULL ;
-        id_entry2->Complex=id_entry1->Complex;
-      }
-
-
-    }
-    else if(strcmp(match,"0")==0 && strcmp(full_id_1,full_id_2)!=0){
-
-
-      id_entry1=find_ID(SiteTable,siteBucketsNum,idBucketsNum,full_id_1);
-      id_entry2=find_ID(SiteTable,siteBucketsNum,idBucketsNum,full_id_2);
-
-      if(id_entry1->Complex!=id_entry2->Complex)
-        append_negative(id_entry1->Complex,id_entry2->Complex) ;
-    }
-
-    line_size=getline(&line,&line_buf_size,DW);                 // get next line
-
-  }
-  free(line) ;
-  fclose(DW) ;
-  /*----------------------- CREATE COMPLEXES AND SETS -----------------------*/
+  // line_size=getline(&line,&line_buf_size,DW);                   // first line not a pair
+  //
+  // while(line_size>0){                                           // loop for each line
+  //
+  //   if(v==0){                                                   // skip first line
+  //     line_size=getline(&line,&line_buf_size,DW);               // get next line
+  //     v=1;
+  //     continue;
+  //   }
+  //
+  //
+  //   full_id_1=strtok(line,",");
+  //   full_id_2=strtok(NULL,",");
+  //   match=strtok(NULL,",");
+  //   match=strtok(match,"\n");
+  //
+  //   if(strcmp(match,"1")==0 && strcmp(full_id_1,full_id_2)!=0){                //if the products are same
+  //
+  //
+  //     id_entry1=find_ID(SiteTable,siteBucketsNum,idBucketsNum,full_id_1);
+  //     id_entry2=find_ID(SiteTable,siteBucketsNum,idBucketsNum,full_id_2);
+  //
+  //     if((id_entry1->Complex!=id_entry2->Complex) && !search_negative(id_entry1->Complex,id_entry2->Complex)){
+  //
+  //       id_entry1->Complex->tail->next=id_entry2->Complex->head ;   // update complex of full_id1
+  //       id_entry1->Complex->tail=id_entry2->Complex->tail ;
+  //
+  //       tmp1=id_entry2->Complex->head;
+  //
+  //       while(tmp1!=NULL){                                        // make complex of all full_id in complex 2
+  //                                                                 // be the same as complex 1
+  //
+  //         if(strcmp(full_id_2,tmp1->id)!=0){
+  //
+  //           tmp_complex=find_ID(SiteTable,siteBucketsNum,idBucketsNum,tmp1->id);
+  //           tmp_complex->Complex=id_entry1->Complex;
+  //         }
+  //
+  //         tmp1=tmp1->next;
+  //
+  //       }
+  //
+  //       change_negatives(id_entry1->Complex,id_entry2->Complex) ;
+  //
+  //       // search_neg_corr(SiteTable,siteBucketsNum,idBucketsNum,id_entry2->Complex) ;
+  //
+  //       delete_negatives(id_entry2->Complex) ;
+  //       free(id_entry2->Complex) ;
+  //       id_entry2->Complex=NULL ;
+  //       id_entry2->Complex=id_entry1->Complex;
+  //     }
+  //
+  //
+  //   }
+  //   else if(strcmp(match,"0")==0 && strcmp(full_id_1,full_id_2)!=0){
+  //
+  //
+  //     id_entry1=find_ID(SiteTable,siteBucketsNum,idBucketsNum,full_id_1);
+  //     id_entry2=find_ID(SiteTable,siteBucketsNum,idBucketsNum,full_id_2);
+  //
+  //     if(id_entry1->Complex!=id_entry2->Complex)
+  //       append_negative(id_entry1->Complex,id_entry2->Complex) ;
+  //   }
+  //
+  //   line_size=getline(&line,&line_buf_size,DW);                 // get next line
+  //
+  // }
+  // free(line) ;
+  // fclose(DW) ;
+  /*--------------------------- CREATE COMPLEXES AND SETS ---------------------------*/
 
   chdir("..") ;
 
@@ -321,34 +321,47 @@ int main(int argc, char** argv){
   // Train=fopen("Train.csv","r") ;
   // Test=fopen("Test.csv","r") ;
   // Validation=fopen("Validation.csv","r") ;
-  Train=fopen("Train.csv","w") ;
-  Test=fopen("Test.csv","w") ;
-  Validation=fopen("Validation.csv","w") ;
 
-  fprintf(Train, "%s,%s,%s\n","left_spec_id","right_spec_id","match" );
-  fprintf(Test, "%s,%s,%s\n","left_spec_id","right_spec_id","match" );
-  fprintf(Validation, "%s,%s,%s\n","left_spec_id","right_spec_id","match" );
-
-  train_test_val_split(SiteTable,siteBucketsNum,idBucketsNum,Train,Test,Validation) ;
-
-  fclose(Train) ;
-  fclose(Test) ;
-  fclose(Validation) ;
+  // Train=fopen("Train.csv","w") ;
+  // Test=fopen("Test.csv","w") ;
+  // Validation=fopen("Validation.csv","w") ;
+  //
+  // fprintf(Train, "%s,%s,%s\n","left_spec_id","right_spec_id","match" );
+  // fprintf(Test, "%s,%s,%s\n","left_spec_id","right_spec_id","match" );
+  // fprintf(Validation, "%s,%s,%s\n","left_spec_id","right_spec_id","match" );
+  //
+  // train_test_val_split(SiteTable,siteBucketsNum,idBucketsNum,Train,Test,Validation) ;
+  //
+  // fclose(Train) ;
+  // fclose(Test) ;
+  // fclose(Validation) ;
 
   Model Linear_Rigression ;
   initialize_model(&Linear_Rigression,bow->dict_len,0.5,0.1) ;
 
-  printf("\n%s\n","Training data .." );
 
-  fit(Linear_Rigression,bow,"Train.csv",SiteTable,siteBucketsNum,idBucketsNum) ;
+  /* ----------------------- START WONKING ON THREADS -------------------------- */
 
-  printf("Predicting Validation set\n" );
+  struct arg_struct* margs = malloc(sizeof(struct arg_struct));
+  margs->model = Linear_Rigression;
+  margs->bow = bow;
+  margs->SiteTable = SiteTable;
+  margs->siteBucketsNum = siteBucketsNum;
+  margs->idBucketsNum = idBucketsNum;
+  margs->sch = sch;
 
-  predict(Linear_Rigression,bow,"Validation.csv",SiteTable,siteBucketsNum,idBucketsNum) ;
+  pthread_t mtid;
+  err = pthread_create(&mtid, NULL, master_thread, (void*)margs);
+  if (err != 0) {
+      /* Create a thread */
+      perror2("pthread_create", err);   exit(1);
+  }
 
-  printf("%s\n","Testing data .." );
 
-  predict(Linear_Rigression,bow,"Test.csv",SiteTable,siteBucketsNum,idBucketsNum) ;
+  pthread_join(mtid, NULL);
+  destroy_scheduler(sch);
+  free(margs);
+
 
   delete(SiteTable,siteBucketsNum,idBucketsNum) ;         // free all structs
   delete_model(&Linear_Rigression) ;

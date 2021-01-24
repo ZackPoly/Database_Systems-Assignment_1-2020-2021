@@ -50,3 +50,6 @@ void delete_unimportant_words(BoW);
 void delete_bow(BoW*);
 
 void bow_to_tf_idf(BoW bow) ;
+
+
+int countlines(const char *);

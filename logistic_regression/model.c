@@ -1,7 +1,5 @@
 #include "model.h"
 
-int countlines(const char *filename);
-
 void initialize_model(Model* model,int vector_size,double b,double learning_rate){
   (*model)=malloc(sizeof(struct model)) ;
 
