@@ -57,7 +57,8 @@ Hashed_Id find_ID(Hash_For_Site SiteTable,int siteBucketsNum,int idBucketsNum,ch
   strcpy(str,full_id) ;
   const char s[3]="//";
   char* site=NULL;
-  site=strtok(str,s);
+  char* rest;
+  site=strtok_r(str,s,&rest);
 
   /* get site and site bucket node*/
   Hashed_Site currSite=search_site_in_hash(SiteTable,site,siteBucketsNum) ;

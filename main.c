@@ -360,6 +360,7 @@ int main(int argc, char** argv){
 
   pthread_join(mtid, NULL);
   destroy_scheduler(sch);
+  free(sch);
   free(margs);
 
 

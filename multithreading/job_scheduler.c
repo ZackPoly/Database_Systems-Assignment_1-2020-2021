@@ -9,7 +9,7 @@ void *master_thread(void *arg) {
   int val_batches = get_batches_num("Validation.csv");
 
   int i,j,k;
-  int epoch=1;
+  int epoch=3;
   // double* derivs=malloc(args->bow->dict_len*sizeof(double));
 
   // double** derivatives = malloc(batches*sizeof(double*));
@@ -86,6 +86,10 @@ void *master_thread(void *arg) {
   }
   execute_all_jobs(args->sch);
 
+  // for(i=1 ; i<=5 ; i++){
+  //   pthread_join(args->sch->tids[i], NULL);
+  // }
+
   fclose(training_file);
   fclose(testing_file);
 
@@ -96,6 +100,8 @@ void *master_thread(void *arg) {
   printf("%lf %%\n",(correct*100)/countlines("Test.csv") );
 
   free(accuracy);
+  free(derivatives);
+  free(line);
 }
 
 
@@ -128,7 +134,12 @@ void *thread_routine(void *arg){
         }
 
         if(job!=NULL){
+          if(job->ftpr==terminate){
+            delete_job(job);
+            pthread_exit((void *) 47);
+          }
           (*(job->ftpr))(job->arg_ptr);                                         // execute job
+          delete_job(job);
 
           if (err = pthread_mutex_lock(&(sch->mtxPJ))) {                           /* Lock queue mutex */
             perror2("pthread_mutex_lock", err); exit(1);
@@ -257,6 +268,13 @@ int destroy_scheduler(JobScheduler* sch){
   return 0;
 }
 
+void delete_job(Job* job){
+  free(job->arg_ptr[4]);
+  free(job->arg_ptr[5]);
+  free(job->arg_ptr);
+  free(job);
+}
+
 int get_batches_num(char* file_name){
 
   int source_lines=countlines(file_name) - 1;
@@ -317,6 +335,8 @@ void train_job(void *args[8]){
   char* match=NULL;
   int line_size=0;
   size_t line_buf_size=0;
+  char* rest1;
+  char* rest2;
 
   int i=0;
   int j=0;
@@ -357,10 +377,10 @@ void train_job(void *args[8]){
 
   while(num_of_pairs<BATCH_SIZE && (line_size=getline(&line,&line_buf_size,training_file))>0){            //for each pair in file,find its vector and store it
 
-    full_id_1=strtok(line,",");
-    full_id_2=strtok(NULL,",");
-    match=strtok(NULL,",");
-    match=strtok(match,"\n");
+    full_id_1=strtok_r(line,",",&rest1);
+    full_id_2=strtok_r(rest1,",",&rest2);
+    match=strtok_r(rest2,"\n",&rest1);
+    //match=strtok_r(match,"\n");
 
     real_match[l]=atof(match);
 
@@ -461,6 +481,8 @@ void test_job(void *args[8]){
   char* match=NULL;
   int line_size=0;
   size_t line_buf_size=0;
+  char* rest1;
+  char* rest2;
 
   double f=0.0;                  //f(x)
   double p=0.0;                  //p(x)
@@ -478,10 +500,10 @@ void test_job(void *args[8]){
 
   while(num_of_pairs<BATCH_SIZE && (line_size=getline(&line,&line_buf_size,testing_file))>0){             //for each pair,predict its label
 
-    full_id_1=strtok(line,",");
-    full_id_2=strtok(NULL,",");
-    match=strtok(NULL,",");
-    match=strtok(match,"\n");
+    full_id_1=strtok_r(line,",",&rest1);
+    full_id_2=strtok_r(rest1,",",&rest2);
+    match=strtok_r(rest2,"\n",&rest1);
+    //match=strtok_r(match,"\n");
 
     left_id=find_ID(SiteTable,siteBucketsNum,idBucketsNum,full_id_1) ;
     right_id=find_ID(SiteTable,siteBucketsNum,idBucketsNum,full_id_2) ;

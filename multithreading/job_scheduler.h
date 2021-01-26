@@ -11,6 +11,8 @@ typedef struct Job {
     void **arg_ptr;             // the argument pointer
 }Job;
 
+void delete_job(Job*);
+
 struct QNode {
     Job* job ;
     struct QNode* next;
